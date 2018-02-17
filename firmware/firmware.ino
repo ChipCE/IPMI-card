@@ -7,11 +7,11 @@
 #include <PubSubClient.h>
 
 
-//reset pin , for reset setting
+//reset pin , for reset setting .pull up
 #define RESETPIN 14
 //use to switch pc power button 
 #define RELAYPIN 13
-//to monitor pc state (from usb)
+//to monitor pc state (from usb)/reverse
 #define SENSEPIN 12
 
 //delay between delay on/off (miliseconds)
@@ -74,7 +74,7 @@ void callback(char* topic, byte* payload, unsigned int length)
   if(message == "power-on")
   {
     //read current pc power state
-    if(digitalRead(SENSEPIN)==LOW)
+    if(digitalRead(SENSEPIN)==HIGH)
     {
       //power is off 
       client.publish(mqtt_pub_topic, "Trying to send power on signal ! Please wait ...");
@@ -84,9 +84,9 @@ void callback(char* topic, byte* payload, unsigned int length)
       digitalWrite(RELAYPIN,LOW);
       //wait for pc to power up
       start = millis();
-      while ((millis()-start)<POWER_ON_WAIT && digitalRead(SENSEPIN)!=HIGH);
+      while ((millis()-start)<POWER_ON_WAIT && digitalRead(SENSEPIN)!=LOW);
       //re-check power state
-      if(digitalRead(SENSEPIN)==HIGH)
+      if(digitalRead(SENSEPIN)==LOW)
         client.publish(mqtt_pub_topic, "Power-on successed!");
       else
         client.publish(mqtt_pub_topic, "Error : Power-on failed");
@@ -100,7 +100,7 @@ void callback(char* topic, byte* payload, unsigned int length)
   if(message == "shutdown")
   {
     //read current pc power state
-    if(digitalRead(SENSEPIN)==HIGH)
+    if(digitalRead(SENSEPIN)==LOW)
     {
       //power is on 
       client.publish(mqtt_pub_topic, "Trying to send shutdown signal ! Please wait ...");
@@ -110,9 +110,9 @@ void callback(char* topic, byte* payload, unsigned int length)
       digitalWrite(RELAYPIN,LOW);
       //wait for pc to power down
       start = millis();
-      while ((millis()-start)<SHUTDOWN_WAIT && digitalRead(SENSEPIN)!=LOW);
+      while ((millis()-start)<SHUTDOWN_WAIT && digitalRead(SENSEPIN)!=HIGH);
       //re-check power state
-      if(digitalRead(SENSEPIN)==LOW)
+      if(digitalRead(SENSEPIN)==HIGH)
         client.publish(mqtt_pub_topic, "Shutdown successed!");
       else
         client.publish(mqtt_pub_topic, "Error : Timeout , cannot shutdown pc !");
@@ -126,7 +126,7 @@ void callback(char* topic, byte* payload, unsigned int length)
   if(message == "force-shutdown")
   {
     //read current pc power state
-    if(digitalRead(SENSEPIN)==HIGH)
+    if(digitalRead(SENSEPIN)==LOW)
     {
       //power is on 
       client.publish(mqtt_pub_topic, "Trying to send force shutdown signal ! Please wait ...");
@@ -134,12 +134,12 @@ void callback(char* topic, byte* payload, unsigned int length)
       digitalWrite(RELAYPIN,HIGH);
       //wait for pc to power down
       start = millis();
-      while ((millis()-start)<FORCE_SHUTDOWN_WAIT && digitalRead(SENSEPIN)!=LOW);
+      while ((millis()-start)<FORCE_SHUTDOWN_WAIT && digitalRead(SENSEPIN)!=HIGH);
       //release the power button
       digitalWrite(RELAYPIN,LOW);
 
       //re-check power state
-      if(digitalRead(SENSEPIN)==LOW)
+      if(digitalRead(SENSEPIN)==HIGH)
         client.publish(mqtt_pub_topic, "Force shutdown successed!");
       else
         client.publish(mqtt_pub_topic, "Error : Timeout , cannot force shutdown pc !");
@@ -153,7 +153,7 @@ void callback(char* topic, byte* payload, unsigned int length)
   if(message == "restart")
   {
     //read current pc power state
-    if(digitalRead(SENSEPIN)==HIGH)
+    if(digitalRead(SENSEPIN)==LOW)
     {
       //power is on 
       client.publish(mqtt_pub_topic, "Trying to send restart signal ! Please wait ...");
@@ -166,9 +166,9 @@ void callback(char* topic, byte* payload, unsigned int length)
       digitalWrite(RELAYPIN,LOW);
       //wait for pc to power down
       start = millis();
-      while ((millis()-start)<SHUTDOWN_WAIT && digitalRead(SENSEPIN)!=LOW);
+      while ((millis()-start)<SHUTDOWN_WAIT && digitalRead(SENSEPIN)!=HIGH);
       //re-check power state
-      if(digitalRead(SENSEPIN)==HIGH)
+      if(digitalRead(SENSEPIN)==LOW)
       {
         client.publish(mqtt_pub_topic, "Error : Timeout , cannot shutdown pc !");
         return;
@@ -182,9 +182,9 @@ void callback(char* topic, byte* payload, unsigned int length)
       digitalWrite(RELAYPIN,LOW);
       //wait for pc to power on
       start = millis();
-      while ((millis()-start)<POWER_ON_WAIT && digitalRead(SENSEPIN)!=HIGH);
+      while ((millis()-start)<POWER_ON_WAIT && digitalRead(SENSEPIN)!=LOW);
       //re-check power state
-      if(digitalRead(SENSEPIN)==HIGH)
+      if(digitalRead(SENSEPIN)==LOW)
         client.publish(mqtt_pub_topic, "Restart successed!");
       else
         client.publish(mqtt_pub_topic, "Error : Cannot restart pc !");
@@ -247,7 +247,8 @@ void setup()
         DynamicJsonBuffer jsonBuffer;
         JsonObject& json = jsonBuffer.parseObject(buf.get());
         json.printTo(Serial);
-        if (json.success()) {
+        if (json.success()) 
+        {
           Serial.println("\n# parsed json");
           strcpy(mqtt_server, json["mqtt_server"]);
           strcpy(mqtt_port, json["mqtt_port"]);
