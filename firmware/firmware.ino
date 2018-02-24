@@ -64,11 +64,26 @@ void callback(char* topic, byte* payload, unsigned int length)
   Serial.print("], ");
   Serial.println(message);
 
-  if(message == "SystemReport")
+  if(message == "help")
   {
+    client.publish(mqtt_pub_topic,"--- Commands list ---");
+    client.publish(mqtt_pub_topic,"help : Display command list.");
+    client.publish(mqtt_pub_topic,"system-report : Display full system information.");
+    client.publish(mqtt_pub_topic,"power-on : Turn on the PC.");
+    client.publish(mqtt_pub_topic,"power-off : Turn off the PC.");
+    client.publish(mqtt_pub_topic,"force-power-off : Force power off the PC.");
+    client.publish(mqtt_pub_topic,"restart : Restart the PC");
+  }
+
+  if(message == "system-report")
+  {
+    client.publish(mqtt_pub_topic, "--- System report ---");
     client.publish(mqtt_pub_topic, version);
-    //client.publish(mqtt_pub_topic,WiFi.localIP());
-    //Serial.print(sensors.getTempCByIndex(0));
+    if(digitalRead(SENSEPIN)==LOW)
+      client.publish(mqtt_pub_topic, "PC power state : ON");
+    else
+      client.publish(mqtt_pub_topic, "PC power state : OFF");
+    client.publish(mqtt_pub_topic, "-- Report end ---");
   }
 
   if(message == "power-on")
@@ -97,7 +112,7 @@ void callback(char* topic, byte* payload, unsigned int length)
     }
   }
 
-  if(message == "shutdown")
+  if(message == "power-off")
   {
     //read current pc power state
     if(digitalRead(SENSEPIN)==LOW)
@@ -123,7 +138,7 @@ void callback(char* topic, byte* payload, unsigned int length)
     }
   }
 
-  if(message == "force-shutdown")
+  if(message == "force-power-off")
   {
     //read current pc power state
     if(digitalRead(SENSEPIN)==LOW)
@@ -397,7 +412,7 @@ void reconnect()
     {
       Serial.println("# Connected to MQTT server");
       //subscribe
-      client.subscribe(mqtt_sub_topic);
+      client.subscribe(mqtt_sub_topic,1);
     } 
     else 
     {
