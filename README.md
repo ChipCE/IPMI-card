@@ -8,3 +8,4 @@ Testing
 3.Switch to 3.45v or 3.5v ldo voltage regulator for better stability  
 4.New firmware with Watchdog and Interrupts  
 5.Add HTTP protocol support (instead of MQTT only in version 1)
+6.Add on-board USB-serial adapter (*)
