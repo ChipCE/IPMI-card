@@ -36,11 +36,14 @@
             this.logGroupBox = new System.Windows.Forms.GroupBox();
             this.logTextBox = new System.Windows.Forms.TextBox();
             this.appConfGroupBox = new System.Windows.Forms.GroupBox();
+            this.durationComboBox = new System.Windows.Forms.ComboBox();
+            this.tooltipDurationLabel = new System.Windows.Forms.Label();
+            this.tooltipCheckbox = new System.Windows.Forms.CheckBox();
             this.baudLabel = new System.Windows.Forms.Label();
             this.saveBtn = new System.Windows.Forms.Button();
             this.startupCheckBox = new System.Windows.Forms.CheckBox();
             this.enableCheckBox = new System.Windows.Forms.CheckBox();
-            this.testBtn = new System.Windows.Forms.Button();
+            this.connectBtn = new System.Windows.Forms.Button();
             this.refreshBtn = new System.Windows.Forms.Button();
             this.baudComboBox = new System.Windows.Forms.ComboBox();
             this.comPortComboBox = new System.Windows.Forms.ComboBox();
@@ -51,9 +54,6 @@
             this.trayMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tooltipCheckbox = new System.Windows.Forms.CheckBox();
-            this.tooltipDurationLabel = new System.Windows.Forms.Label();
-            this.durationComboBox = new System.Windows.Forms.ComboBox();
             this.tabControl.SuspendLayout();
             this.appConfTab.SuspendLayout();
             this.logGroupBox.SuspendLayout();
@@ -121,7 +121,7 @@
             this.appConfGroupBox.Controls.Add(this.saveBtn);
             this.appConfGroupBox.Controls.Add(this.startupCheckBox);
             this.appConfGroupBox.Controls.Add(this.enableCheckBox);
-            this.appConfGroupBox.Controls.Add(this.testBtn);
+            this.appConfGroupBox.Controls.Add(this.connectBtn);
             this.appConfGroupBox.Controls.Add(this.refreshBtn);
             this.appConfGroupBox.Controls.Add(this.baudComboBox);
             this.appConfGroupBox.Controls.Add(this.comPortComboBox);
@@ -132,6 +132,42 @@
             this.appConfGroupBox.TabIndex = 0;
             this.appConfGroupBox.TabStop = false;
             this.appConfGroupBox.Text = "Application config";
+            // 
+            // durationComboBox
+            // 
+            this.durationComboBox.FormattingEnabled = true;
+            this.durationComboBox.Items.AddRange(new object[] {
+            "200",
+            "300",
+            "500",
+            "1000",
+            "2000",
+            "3000",
+            "5000"});
+            this.durationComboBox.Location = new System.Drawing.Point(425, 72);
+            this.durationComboBox.Name = "durationComboBox";
+            this.durationComboBox.Size = new System.Drawing.Size(121, 21);
+            this.durationComboBox.TabIndex = 11;
+            this.durationComboBox.Text = "--Select--";
+            // 
+            // tooltipDurationLabel
+            // 
+            this.tooltipDurationLabel.AutoSize = true;
+            this.tooltipDurationLabel.Location = new System.Drawing.Point(356, 77);
+            this.tooltipDurationLabel.Name = "tooltipDurationLabel";
+            this.tooltipDurationLabel.Size = new System.Drawing.Size(66, 13);
+            this.tooltipDurationLabel.TabIndex = 10;
+            this.tooltipDurationLabel.Text = "Duration(ms)";
+            // 
+            // tooltipCheckbox
+            // 
+            this.tooltipCheckbox.AutoSize = true;
+            this.tooltipCheckbox.Location = new System.Drawing.Point(10, 76);
+            this.tooltipCheckbox.Name = "tooltipCheckbox";
+            this.tooltipCheckbox.Size = new System.Drawing.Size(197, 17);
+            this.tooltipCheckbox.TabIndex = 9;
+            this.tooltipCheckbox.Text = "Show tooltip when excute command";
+            this.tooltipCheckbox.UseVisualStyleBackColor = true;
             // 
             // baudLabel
             // 
@@ -171,14 +207,14 @@
             this.enableCheckBox.Text = "Enable control";
             this.enableCheckBox.UseVisualStyleBackColor = true;
             // 
-            // testBtn
+            // connectBtn
             // 
-            this.testBtn.Location = new System.Drawing.Point(427, 20);
-            this.testBtn.Name = "testBtn";
-            this.testBtn.Size = new System.Drawing.Size(117, 23);
-            this.testBtn.TabIndex = 4;
-            this.testBtn.Text = "Test connection";
-            this.testBtn.UseVisualStyleBackColor = true;
+            this.connectBtn.Location = new System.Drawing.Point(427, 20);
+            this.connectBtn.Name = "connectBtn";
+            this.connectBtn.Size = new System.Drawing.Size(117, 23);
+            this.connectBtn.TabIndex = 4;
+            this.connectBtn.Text = "Connect";
+            this.connectBtn.UseVisualStyleBackColor = true;
             // 
             // refreshBtn
             // 
@@ -231,7 +267,7 @@
             this.moduleConfTab.Location = new System.Drawing.Point(4, 22);
             this.moduleConfTab.Name = "moduleConfTab";
             this.moduleConfTab.Padding = new System.Windows.Forms.Padding(3);
-            this.moduleConfTab.Size = new System.Drawing.Size(569, 397);
+            this.moduleConfTab.Size = new System.Drawing.Size(569, 369);
             this.moduleConfTab.TabIndex = 1;
             this.moduleConfTab.Text = "Module config";
             this.moduleConfTab.UseVisualStyleBackColor = true;
@@ -240,7 +276,7 @@
             // 
             this.aboutTab.Location = new System.Drawing.Point(4, 22);
             this.aboutTab.Name = "aboutTab";
-            this.aboutTab.Size = new System.Drawing.Size(569, 397);
+            this.aboutTab.Size = new System.Drawing.Size(569, 369);
             this.aboutTab.TabIndex = 2;
             this.aboutTab.Text = "About";
             this.aboutTab.UseVisualStyleBackColor = true;
@@ -274,42 +310,6 @@
             this.closeToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.closeToolStripMenuItem.Text = "Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
-            // 
-            // tooltipCheckbox
-            // 
-            this.tooltipCheckbox.AutoSize = true;
-            this.tooltipCheckbox.Location = new System.Drawing.Point(10, 76);
-            this.tooltipCheckbox.Name = "tooltipCheckbox";
-            this.tooltipCheckbox.Size = new System.Drawing.Size(197, 17);
-            this.tooltipCheckbox.TabIndex = 9;
-            this.tooltipCheckbox.Text = "Show tooltip when excute command";
-            this.tooltipCheckbox.UseVisualStyleBackColor = true;
-            // 
-            // tooltipDurationLabel
-            // 
-            this.tooltipDurationLabel.AutoSize = true;
-            this.tooltipDurationLabel.Location = new System.Drawing.Point(356, 77);
-            this.tooltipDurationLabel.Name = "tooltipDurationLabel";
-            this.tooltipDurationLabel.Size = new System.Drawing.Size(66, 13);
-            this.tooltipDurationLabel.TabIndex = 10;
-            this.tooltipDurationLabel.Text = "Duration(ms)";
-            // 
-            // durationComboBox
-            // 
-            this.durationComboBox.FormattingEnabled = true;
-            this.durationComboBox.Items.AddRange(new object[] {
-            "200",
-            "300",
-            "500",
-            "1000",
-            "2000",
-            "3000",
-            "5000"});
-            this.durationComboBox.Location = new System.Drawing.Point(425, 72);
-            this.durationComboBox.Name = "durationComboBox";
-            this.durationComboBox.Size = new System.Drawing.Size(121, 21);
-            this.durationComboBox.TabIndex = 11;
-            this.durationComboBox.Text = "--Select--";
             // 
             // mainForm
             // 
@@ -349,7 +349,7 @@
         private System.Windows.Forms.Button saveBtn;
         private System.Windows.Forms.CheckBox startupCheckBox;
         private System.Windows.Forms.CheckBox enableCheckBox;
-        private System.Windows.Forms.Button testBtn;
+        private System.Windows.Forms.Button connectBtn;
         private System.Windows.Forms.Button refreshBtn;
         private System.Windows.Forms.ComboBox baudComboBox;
         private System.Windows.Forms.ComboBox comPortComboBox;

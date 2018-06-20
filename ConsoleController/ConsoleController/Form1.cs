@@ -13,6 +13,9 @@ namespace ConsoleController
 {
     public partial class mainForm : Form
     {
+        private Config config;
+        private ConfigManager configMan;
+
         public mainForm()
         {
             InitializeComponent();
@@ -26,8 +29,8 @@ namespace ConsoleController
             {
                 comPortComboBox.Items.Add(comPort);  
             }
-
-            
+            //load config 
+            configMan = new ConfigManager();
         }
 
    
