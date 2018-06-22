@@ -186,6 +186,7 @@
             this.saveBtn.TabIndex = 7;
             this.saveBtn.Text = "Save setting";
             this.saveBtn.UseVisualStyleBackColor = true;
+            this.saveBtn.Click += new System.EventHandler(this.saveBtn_Click);
             // 
             // startupCheckBox
             // 
@@ -323,7 +324,7 @@
             this.Name = "mainForm";
             this.Text = "Console Controller";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.mainForm_FormClosing);
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.Resize += new System.EventHandler(this.mainForm_Resize);
             this.tabControl.ResumeLayout(false);
             this.appConfTab.ResumeLayout(false);
