@@ -54,7 +54,9 @@ namespace ConsoleController
                     {
                         textBox.AppendText("Received command : " + msg + "\n");
                     }
-                    if(notifyIcon!=null && config.tooltip)
+
+                    //tray tooltip
+                    if(notifyIcon!=null && config.tooltip && config.enable && connected)
                     {
                         notifyIcon.ShowBalloonTip(config.duration, "Console controller", msg, System.Windows.Forms.ToolTipIcon.Info);
                     }
