@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using Microsoft.Win32;
 
 
 namespace ConsoleController
@@ -38,7 +40,8 @@ namespace ConsoleController
         {
             try
             {
-                System.IO.StreamReader file = new System.IO.StreamReader("config.conf");
+                String dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\config.conf";
+                System.IO.StreamReader file = new System.IO.StreamReader(dir);
                 string line;
                 int tmp = 0;
                 for(int i=0; (line = file.ReadLine()) != null;i++)
@@ -83,13 +86,13 @@ namespace ConsoleController
                             }
                             break;
                         case 5:
-                            if(line!="true" && line != "false")
+                            if(line!="True" && line != "False")
                             {
                                 file.Close();
                                 Console.WriteLine("Invalid config.conf");
                                 return false;
                             }
-                            if (line == "true")
+                            if (line == "True")
                                 config.enable = true;
                             else
                                 config.enable = false;
@@ -103,13 +106,13 @@ namespace ConsoleController
                             }
                             break;
                         case 7:
-                            if (line != "true" && line != "false")
+                            if (line != "True" && line != "False")
                             {
                                 file.Close();
                                 Console.WriteLine("Invalid config.conf");
                                 return false;
                             }
-                            if (line == "true")
+                            if (line == "True")
                                 config.tooltip = true;
                             else
                                 config.tooltip = false;
@@ -140,13 +143,13 @@ namespace ConsoleController
                             }
                             break;
                         case 11:
-                            if (line != "true" && line != "false")
+                            if (line != "True" && line != "False")
                             {
                                 file.Close();
                                 Console.WriteLine("Invalid config.conf");
                                 return false;
                             }
-                            if (line == "true")
+                            if (line == "True")
                                 config.startup = true;
                             else
                                 config.startup = false;
@@ -163,14 +166,63 @@ namespace ConsoleController
             }
         }
 
-        public bool writeConfig()
+        public bool writeConfig(Config tmpConf)
         {
+            //update config
+            config = tmpConf;
+
+            //write config.conf
+            try
+            {
+                String dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\config.conf";
+                System.IO.StreamWriter file = new System.IO.StreamWriter(dir);
+                file.WriteLine("[port]");
+                file.WriteLine(config.port);
+                file.WriteLine("[baudRate]");
+                file.WriteLine(config.baudRate);
+                file.WriteLine("[enable]");
+                file.WriteLine(config.enable);
+                file.WriteLine("[tooltip]");
+                file.WriteLine(config.tooltip);
+                file.WriteLine("[duration]");
+                file.WriteLine(config.duration);
+                file.WriteLine("[startup]");
+                file.WriteLine(config.startup);
+
+                Console.WriteLine("Config saved!");
+                file.Close(); 
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
+
+            //write system startup entry
+            setWinStartup();
+
+
             return true;
         }
 
         public Config getconfig()
         {
             return config;
+        }
+
+        private void setWinStartup()
+        {
+            String appLocation = System.IO.Path.GetDirectoryName(Application.ExecutablePath) + "\\ConsoleController.exe";
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+
+            if (config.startup)
+            {
+                rk.SetValue("ConsoleController.exe", Application.ExecutablePath);
+            }
+            else
+            {
+                rk.DeleteValue("ConsoleController", false);
+            }
         }
     }
 

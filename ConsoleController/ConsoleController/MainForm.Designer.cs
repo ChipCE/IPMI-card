@@ -36,6 +36,7 @@
             this.logGroupBox = new System.Windows.Forms.GroupBox();
             this.logTextBox = new System.Windows.Forms.TextBox();
             this.appConfGroupBox = new System.Windows.Forms.GroupBox();
+            this.disconnectBtn = new System.Windows.Forms.Button();
             this.durationComboBox = new System.Windows.Forms.ComboBox();
             this.tooltipDurationLabel = new System.Windows.Forms.Label();
             this.tooltipCheckbox = new System.Windows.Forms.CheckBox();
@@ -114,6 +115,7 @@
             // 
             // appConfGroupBox
             // 
+            this.appConfGroupBox.Controls.Add(this.disconnectBtn);
             this.appConfGroupBox.Controls.Add(this.durationComboBox);
             this.appConfGroupBox.Controls.Add(this.tooltipDurationLabel);
             this.appConfGroupBox.Controls.Add(this.tooltipCheckbox);
@@ -133,6 +135,17 @@
             this.appConfGroupBox.TabStop = false;
             this.appConfGroupBox.Text = "Application config";
             // 
+            // disconnectBtn
+            // 
+            this.disconnectBtn.Enabled = false;
+            this.disconnectBtn.Location = new System.Drawing.Point(427, 48);
+            this.disconnectBtn.Name = "disconnectBtn";
+            this.disconnectBtn.Size = new System.Drawing.Size(117, 23);
+            this.disconnectBtn.TabIndex = 12;
+            this.disconnectBtn.Text = "Disconnect";
+            this.disconnectBtn.UseVisualStyleBackColor = true;
+            this.disconnectBtn.Click += new System.EventHandler(this.disconnectBtn_Click);
+            // 
             // durationComboBox
             // 
             this.durationComboBox.FormattingEnabled = true;
@@ -144,7 +157,7 @@
             "2000",
             "3000",
             "5000"});
-            this.durationComboBox.Location = new System.Drawing.Point(425, 72);
+            this.durationComboBox.Location = new System.Drawing.Point(425, 74);
             this.durationComboBox.Name = "durationComboBox";
             this.durationComboBox.Size = new System.Drawing.Size(121, 21);
             this.durationComboBox.TabIndex = 11;
@@ -153,7 +166,7 @@
             // tooltipDurationLabel
             // 
             this.tooltipDurationLabel.AutoSize = true;
-            this.tooltipDurationLabel.Location = new System.Drawing.Point(356, 77);
+            this.tooltipDurationLabel.Location = new System.Drawing.Point(353, 77);
             this.tooltipDurationLabel.Name = "tooltipDurationLabel";
             this.tooltipDurationLabel.Size = new System.Drawing.Size(66, 13);
             this.tooltipDurationLabel.TabIndex = 10;
@@ -168,6 +181,7 @@
             this.tooltipCheckbox.TabIndex = 9;
             this.tooltipCheckbox.Text = "Show tooltip when excute command";
             this.tooltipCheckbox.UseVisualStyleBackColor = true;
+            this.tooltipCheckbox.CheckedChanged += new System.EventHandler(this.tooltipCheckbox_CheckedChanged);
             // 
             // baudLabel
             // 
@@ -197,6 +211,7 @@
             this.startupCheckBox.TabIndex = 6;
             this.startupCheckBox.Text = "Start application on Windows startup";
             this.startupCheckBox.UseVisualStyleBackColor = true;
+            this.startupCheckBox.CheckedChanged += new System.EventHandler(this.startupCheckBox_CheckedChanged);
             // 
             // enableCheckBox
             // 
@@ -207,6 +222,8 @@
             this.enableCheckBox.TabIndex = 5;
             this.enableCheckBox.Text = "Enable control";
             this.enableCheckBox.UseVisualStyleBackColor = true;
+            this.enableCheckBox.CheckedChanged += new System.EventHandler(this.enableCheckBox_CheckedChanged);
+            this.enableCheckBox.EnabledChanged += new System.EventHandler(this.enableCheckBox_EnabledChanged);
             // 
             // connectBtn
             // 
@@ -216,6 +233,7 @@
             this.connectBtn.TabIndex = 4;
             this.connectBtn.Text = "Connect";
             this.connectBtn.UseVisualStyleBackColor = true;
+            this.connectBtn.Click += new System.EventHandler(this.connectBtn_Click);
             // 
             // refreshBtn
             // 
@@ -244,6 +262,7 @@
             this.baudComboBox.Size = new System.Drawing.Size(111, 21);
             this.baudComboBox.TabIndex = 2;
             this.baudComboBox.Text = "--Select--";
+            this.baudComboBox.SelectedValueChanged += new System.EventHandler(this.baudComboBox_SelectedValueChanged);
             // 
             // comPortComboBox
             // 
@@ -253,6 +272,7 @@
             this.comPortComboBox.Size = new System.Drawing.Size(111, 21);
             this.comPortComboBox.TabIndex = 1;
             this.comPortComboBox.Text = "--Select--";
+            this.comPortComboBox.SelectedValueChanged += new System.EventHandler(this.comPortComboBox_SelectedValueChanged);
             // 
             // comPortLabel
             // 
@@ -363,6 +383,7 @@
         private System.Windows.Forms.CheckBox tooltipCheckbox;
         private System.Windows.Forms.ComboBox durationComboBox;
         private System.Windows.Forms.Label tooltipDurationLabel;
+        private System.Windows.Forms.Button disconnectBtn;
     }
 }
 
