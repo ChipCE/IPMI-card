@@ -21,8 +21,6 @@ namespace ConsoleController
         {
             InitializeComponent();
             notifyIcon.Visible = true;
-            TextBox.CheckForIllegalCrossThreadCalls = false;
-            System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
         }
 
 
@@ -44,12 +42,20 @@ namespace ConsoleController
                     {
                         if(updateRunningConfig())
                         {
-                            serialController = new SerialController(config.port, config.baudRate,logTextBox,notifyIcon);
+                            serialController = new SerialController(config,logTextBox,notifyIcon);
                             serialController.updateConfig(config);
                             if (serialController.connect())
                             {
                                 logTextBox.AppendText("Auto connect success!\n");
-                                disconnectBtn.Enabled = true;
+                                statusLabel.Text = "Connected: " + config.port;
+                                enableConfigControl(true);
+
+                                //hide
+                                this.Hide();
+                                //hide taskbar icon
+                                this.ShowInTaskbar = false;
+                                //show tooltip
+                                notifyIcon.ShowBalloonTip(1000, "Console controller", "Application is running in background.", ToolTipIcon.Info);
                             }
                             else
                             {
@@ -258,21 +264,31 @@ namespace ConsoleController
 
                     if (serialController != null)
                     {
-                        //disconnec from current connect (if connected)
+                        serialController.disconnect();
+                        enableConfigControl(false);
+                        statusLabel.Text = "Idle";
+
+                        serialController.updateConfig(config);
+                        //reconnect 
                         if (serialController.connected)
                         {
                             logTextBox.AppendText("Trying to connect with new setting!\n");
-                            serialController.disconnect();
-                            serialController.updateConfig(config);
                             if (serialController.connect())
                             {
                                 logTextBox.AppendText("Connected!\n");
+                                statusLabel.Text = "Connected: " + config.port;
+                                enableConfigControl(true);
                             }
                             else
                             {
                                 logTextBox.AppendText("Cannot connect!\n");
                             }
                         }
+                    }
+                    else
+                    {
+                        //init new serial
+                        serialController = new SerialController(config, logTextBox, notifyIcon);
                     }
                 }
                 else
@@ -290,16 +306,21 @@ namespace ConsoleController
         {
             //close old connection (just in case)
             if (serialController != null)
+            {
                 serialController.disconnect();
+                statusLabel.Text = "Idle";
+                enableConfigControl(false);
+            }
 
+            //load GUI profile to runningConfig
             if (updateRunningConfig())
             {
-                serialController = new SerialController(config.port, config.baudRate,logTextBox,notifyIcon);
-                serialController.updateConfig(config);
+                serialController = new SerialController(config,logTextBox,notifyIcon);
                 if (serialController.connect())
                 {
-                    disconnectBtn.Enabled = true;
                     Console.WriteLine("Connect success!");
+                    statusLabel.Text = "Connected: " + config.port;
+                    enableConfigControl(true);
                 }
                 else
                 {
@@ -316,7 +337,8 @@ namespace ConsoleController
         {
             serialController.disconnect();
             Console.WriteLine("Disconnected!");
-            disconnectBtn.Enabled = false;
+            statusLabel.Text = "Idle";
+            enableConfigControl(false);
         }
 
         private bool updateRunningConfig()
@@ -363,84 +385,115 @@ namespace ConsoleController
             }
         }
 
-        private void comPortComboBox_SelectedValueChanged(object sender, EventArgs e)
+        private void moduleRebootBtn_Click(object sender, EventArgs e)
         {
-            if(serialController!=null)
+            //send reboot command via serial
+            if(serialController.connected)
             {
-                if (serialController.connected)
-                {
-                    serialController.disconnect();
-                    logTextBox.AppendText("Setting changed! Disconnect\n");
-                    disconnectBtn.Enabled = false;
-                }
+
             }
         }
 
-        private void baudComboBox_SelectedValueChanged(object sender, EventArgs e)
+        private void moduleClearBtn_Click(object sender, EventArgs e)
         {
-            if (serialController != null)
+            //send clear config and reboot command to module via serial
+            if(serialController.connected)
             {
-                if (serialController.connected)
-                {
-                    serialController.disconnect();
-                    logTextBox.AppendText("Setting changed! Disconnect");
-                    disconnectBtn.Enabled = false;
-                }
+
             }
         }
 
-        private void enableCheckBox_EnabledChanged(object sender, EventArgs e)
+        private void moduleSaveBtn_Click(object sender, EventArgs e)
         {
-            if (serialController != null)
+            //send new config and reboot command to module via serial
+            if(serialController.connected)
             {
-                if (serialController.connected)
+                //check current args
+                string result = checkModuleConfig();
+                if (result == "")
                 {
-                    serialController.disconnect();
-                    logTextBox.AppendText("Setting changed! Disconnect\n");
-                    disconnectBtn.Enabled = false;
-                }
-            }
-        }
+                    //send it
 
-        private void enableCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (serialController != null)
-            {
-                if (serialController.connected)
-                {
-                    serialController.disconnect();
-                    logTextBox.AppendText("Setting changed! Disconnect\n");
-                    disconnectBtn.Enabled = false;
-                }
-            }
-        }
 
-        private void tooltipCheckbox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (serialController != null)
-            {
-                if (serialController.connected)
-                {
-                    serialController.disconnect();
-                    logTextBox.AppendText("Setting changed! Disconnect\n");
-                    disconnectBtn.Enabled = false;
+                    showDialog("New setting was sent via UART", "Sent");
                 }
-            }
-        }
-
-        private void startupCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (serialController != null)
-            {
-                if (serialController.connected)
-                {
-                    serialController.disconnect();
-                    logTextBox.AppendText("Setting changed! Disconnect\n");
-                    disconnectBtn.Enabled = false;
-                }
+                else
+                    showDialog(result, "Error");
             }
         }
 
 
+        private void enableConfigControl(bool enable)
+        {
+            if(enable)
+            {
+                moduleClearBtn.Enabled = true;
+                moduleRebootBtn.Enabled = true;
+                moduleSaveBtn.Enabled = true;
+                statusBtn.Enabled = true;
+                disconnectBtn.Enabled = true;
+            }
+            else
+            {
+                moduleClearBtn.Enabled = false;
+                moduleRebootBtn.Enabled = false;
+                moduleSaveBtn.Enabled = false;
+                statusBtn.Enabled = false;
+                disconnectBtn.Enabled = false;
+            }
+        }
+
+        private string checkModuleConfig()
+        {
+            //empty value check
+            if (wifiSsidTextbox.Text == "")
+                return "Invalid SSID";
+
+
+             if(mqttServerTextbox.Text == "")
+                return "Invalid MQTT server";
+
+            if(mqttPortTextbox.Text == "")
+                return "Invalid MQTT port";
+
+            if(mqttSubTextbox.Text == "")
+                return "Invalid MQTT sub";
+
+            if(mqttPubTextbox.Text == "")
+                return "Invalid MQTT pub";
+
+
+
+
+            //number only check
+            int tmp;
+            if (!Int32.TryParse(mqttPortTextbox.Text, out tmp))
+                return "Invalid MQTT port";
+
+            if ((passwdConfrimTextbox1.Text != "" || passwdConfirmTextbox2.Text != "") && (passwdConfirmTextbox2.Text != passwdConfrimTextbox1.Text))
+                return "Confirm password not matched";
+
+            return "";
+        }
+
+        private void showDialog(string message,string caption)
+        {
+            MessageBoxButtons buttons = MessageBoxButtons.OK;
+            DialogResult result;
+
+            // Displays the MessageBox.
+            result = MessageBox.Show(message, caption, buttons);
+
+            if (result == System.Windows.Forms.DialogResult.Yes)
+            {
+                // Closes the parent form.
+                this.Close();
+            }
+        }
+
+        private void statusBtn_Click(object sender, EventArgs e)
+        {
+            serialController.send("{status}");
+        }
     }
 }

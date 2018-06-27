@@ -18,3 +18,5 @@ C:\Users\Chip\Documents\GitHub\IPMI-card\ConsoleController\ConsoleController\obj
 C:\Users\Chip\Documents\GitHub\IPMI-card\ConsoleController\ConsoleController\obj\Debug\ConsoleController.csproj.CoreCompileInputs.cache
 C:\Users\Chip\Documents\GitHub\IPMI-card\ConsoleController\ConsoleController\obj\Debug\ConsoleController.exe
 C:\Users\Chip\Documents\GitHub\IPMI-card\ConsoleController\ConsoleController\obj\Debug\ConsoleController.pdb
+C:\Users\Chip\Documents\GitHub\IPMI-card\ConsoleController\ConsoleController\bin\Debug\System.Management.Automation.dll
+C:\Users\Chip\Documents\GitHub\IPMI-card\ConsoleController\ConsoleController\obj\Debug\ConsoleController.csproj.CopyComplete
