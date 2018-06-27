@@ -493,7 +493,8 @@ namespace ConsoleController
 
         private void statusBtn_Click(object sender, EventArgs e)
         {
-            serialController.send("{status}");
+            if(serialController.connected)
+                serialController.send("{status}");
         }
     }
 }
