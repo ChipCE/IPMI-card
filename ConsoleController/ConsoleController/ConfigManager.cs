@@ -217,7 +217,7 @@ namespace ConsoleController
 
             if (config.startup)
             {
-                rk.SetValue("ConsoleController.exe", Application.ExecutablePath);
+                rk.SetValue("ConsoleController", Application.ExecutablePath);
             }
             else
             {
