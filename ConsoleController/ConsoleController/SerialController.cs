@@ -19,17 +19,19 @@ namespace ConsoleController
         public delegate void DataReceivedHandler(byte[] data);
         public bool connected;
         private Config config;
-        private System.Windows.Forms.TextBox textBox;
+        private System.Windows.Forms.TextBox textbox;
+        private System.Windows.Forms.TextBox debugTextbox;
         private System.Windows.Forms.NotifyIcon notifyIcon;
         ConsoleController console;
 
 
 
-        public SerialController(Config _config, System.Windows.Forms.TextBox textBoxControl, System.Windows.Forms.NotifyIcon notifyIconControl)
+        public SerialController(Config _config, System.Windows.Forms.TextBox textBoxControl, System.Windows.Forms.TextBox debugTextBoxControl, System.Windows.Forms.NotifyIcon notifyIconControl)
         {
             config = _config;
             serial = new SerialPort(config.port, config.baudRate, Parity.None, 8, StopBits.One);
-            textBox = textBoxControl;
+            textbox = textBoxControl;
+            debugTextbox = debugTextBoxControl;
             notifyIcon = notifyIconControl;
             connected = false;
             console = new ConsoleController();
@@ -57,13 +59,13 @@ namespace ConsoleController
             {
                 string msg = serial.ReadLine();
                 Console.WriteLine("Received msg : " + msg);
-                if(msg[0]!='#')
+                if(msg[0]!='#' && msg[0] != '$' && msg[0]!= '\r' && msg[0] != '\n' && msg.Length>0)
                 {
                     //if msg are not the devide debug
-                    if(textBox!=null && connected)
+                    if(textbox!=null && connected)
                     {
-                        //textBox.AppendText("Received command : " + msg + "\n");
-                        appendTextBox("Received command : " + msg + "\n");
+                        //textbox.AppendText("Received command : " + msg + "\n");
+                        appendTextbox("Received command : " + msg + "\n");
                     }
 
                     //tray tooltip
@@ -74,18 +76,25 @@ namespace ConsoleController
 
                     if (config.enable && connected)
                     {
-                        appendTextBox("Trying to excute command: " + msg + "\n");
+                        appendTextbox("Trying to excute command: " + msg + "\n");
                         //try to excute it
                         StringCollection resultCollection = console.excuteCommand(msg);
                         //display the output
                         foreach(string result in resultCollection)
                         {
-                            appendTextBox(result + "\n");
+                            appendTextbox(result + "\n");
                         }
-                        //send back result to device
+                        //send back result to device via serial
 
                     }
 
+                }
+                else
+                {
+                    if(msg[0]=='$')
+                        appendTextbox(msg + "\n");
+                    if (msg[0] == '#')
+                        appendDebugTextbox(msg + "\n");
                 }
             }
             catch(Exception exp)
@@ -109,10 +118,8 @@ namespace ConsoleController
 
         public bool send(string msg)
         {
-
-
             serial.WriteLine(msg);
-            appendTextBox("Send \"" + msg + "\"to module\n");
+            appendTextbox("Send \"" + msg + "\"to module\n");
             return true;
         }
 
@@ -124,14 +131,21 @@ namespace ConsoleController
             else return false;
             return true;
         }
-        public void appendTextBox(String text)
+        public void appendTextbox(String text)
         {
             //Check if invoke requied if so return - as i will be recalled in correct thread
-            if (ControlInvokeRequired(textBox, () => appendTextBox(text))) return;
-            //textBox.Text = ellapsed;
-            textBox.AppendText(text);
+            if (ControlInvokeRequired(textbox, () => appendTextbox(text))) return;
+            //textbox.Text = ellapsed;
+            textbox.AppendText(text);
         }
 
-        
+        public void appendDebugTextbox(String text)
+        {
+            //Check if invoke requied if so return - as i will be recalled in correct thread
+            if (ControlInvokeRequired(debugTextbox, () => appendDebugTextbox(text))) return;
+            //textbox.Text = ellapsed;
+            debugTextbox.AppendText(text);
+        }
+
     }
 }

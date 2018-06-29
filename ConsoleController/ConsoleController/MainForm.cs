@@ -42,7 +42,7 @@ namespace ConsoleController
                     {
                         if(updateRunningConfig())
                         {
-                            serialController = new SerialController(config,logTextBox,notifyIcon);
+                            serialController = new SerialController(config,logTextBox,debugTextBox,notifyIcon);
                             serialController.updateConfig(config);
                             if (serialController.connect())
                             {
@@ -109,7 +109,7 @@ namespace ConsoleController
                 }
                 index++;
             }
-            if(index > comPortComboBox.Items.Count || comPortComboBox.Items.Count==0)
+            if(index >= comPortComboBox.Items.Count || comPortComboBox.Items.Count==0)
             {
                 success = false;
             }
@@ -127,7 +127,7 @@ namespace ConsoleController
                 }
                 index++;
             }
-            if (index > baudComboBox.Items.Count || baudComboBox.Items.Count == 0)
+            if (index >= baudComboBox.Items.Count || baudComboBox.Items.Count == 0)
             {
                 success = false;
             }
@@ -156,7 +156,7 @@ namespace ConsoleController
                 }
                 index++;
             }
-            if (index > durationComboBox.Items.Count || durationComboBox.Items.Count == 0)
+            if (index >= durationComboBox.Items.Count || durationComboBox.Items.Count == 0)
             {
                 success = false;
             }
@@ -166,9 +166,6 @@ namespace ConsoleController
                 startupCheckBox.Checked = true;
             else
                 startupCheckBox.Checked = false;
-            
-            //run startup script
-
 
             return success;
         }
@@ -288,7 +285,7 @@ namespace ConsoleController
                     else
                     {
                         //init new serial
-                        serialController = new SerialController(config, logTextBox, notifyIcon);
+                        serialController = new SerialController(config, logTextBox, debugTextBox, notifyIcon);
                     }
                 }
                 else
@@ -315,16 +312,18 @@ namespace ConsoleController
             //load GUI profile to runningConfig
             if (updateRunningConfig())
             {
-                serialController = new SerialController(config,logTextBox,notifyIcon);
+                serialController = new SerialController(config,logTextBox, debugTextBox, notifyIcon);
                 if (serialController.connect())
                 {
                     Console.WriteLine("Connect success!");
                     statusLabel.Text = "Connected: " + config.port;
+                    logTextBox.AppendText("Connected to : "+ config.port+"\n");
                     enableConfigControl(true);
                 }
                 else
                 {
                     Console.WriteLine("Cannot connect to serial port!");
+                    logTextBox.AppendText("Cannot connect to : " + config.port + "\n");
                 }
             }
             else
@@ -493,8 +492,8 @@ namespace ConsoleController
 
         private void statusBtn_Click(object sender, EventArgs e)
         {
-            if(serialController.connected)
-                serialController.send("{status}");
+            if (serialController.connected)
+                serialController.send("{\"command\":\"status\",\"args\":\"none\"}");
         }
     }
 }

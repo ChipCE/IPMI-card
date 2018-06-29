@@ -35,6 +35,9 @@
             this.tabControl = new System.Windows.Forms.TabControl();
             this.appConfTab = new System.Windows.Forms.TabPage();
             this.appConfGroupBox = new System.Windows.Forms.GroupBox();
+            this.startupLabel = new System.Windows.Forms.Label();
+            this.tooltipLabel = new System.Windows.Forms.Label();
+            this.enableLabel = new System.Windows.Forms.Label();
             this.statusBtn = new System.Windows.Forms.Button();
             this.disconnectBtn = new System.Windows.Forms.Button();
             this.durationComboBox = new System.Windows.Forms.ComboBox();
@@ -80,15 +83,15 @@
             this.wifiSsidTextbox = new System.Windows.Forms.TextBox();
             this.wifiPasswdTextbox = new System.Windows.Forms.TextBox();
             this.aboutTab = new System.Windows.Forms.TabPage();
-            this.logGroupBox = new System.Windows.Forms.GroupBox();
             this.logTextBox = new System.Windows.Forms.TextBox();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.trayMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.enableLabel = new System.Windows.Forms.Label();
-            this.tooltipLabel = new System.Windows.Forms.Label();
-            this.startupLabel = new System.Windows.Forms.Label();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.debugTextBox = new System.Windows.Forms.TextBox();
             this.statusStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.appConfTab.SuspendLayout();
@@ -97,15 +100,17 @@
             this.securityConfigGroupBox.SuspendLayout();
             this.mqttConfigGroupBox.SuspendLayout();
             this.wifiConfigGroupBox.SuspendLayout();
-            this.logGroupBox.SuspendLayout();
             this.trayMenu.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip
             // 
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statusLabel});
-            this.statusStrip.Location = new System.Drawing.Point(0, 470);
+            this.statusStrip.Location = new System.Drawing.Point(0, 522);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(577, 22);
             this.statusStrip.TabIndex = 8;
@@ -164,6 +169,36 @@
             this.appConfGroupBox.TabIndex = 0;
             this.appConfGroupBox.TabStop = false;
             this.appConfGroupBox.Text = "Application config";
+            // 
+            // startupLabel
+            // 
+            this.startupLabel.AutoSize = true;
+            this.startupLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.startupLabel.Location = new System.Drawing.Point(23, 149);
+            this.startupLabel.Name = "startupLabel";
+            this.startupLabel.Size = new System.Drawing.Size(366, 13);
+            this.startupLabel.TabIndex = 14;
+            this.startupLabel.Text = "Write registry entry to SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+            // 
+            // tooltipLabel
+            // 
+            this.tooltipLabel.AutoSize = true;
+            this.tooltipLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.tooltipLabel.Location = new System.Drawing.Point(23, 113);
+            this.tooltipLabel.Name = "tooltipLabel";
+            this.tooltipLabel.Size = new System.Drawing.Size(211, 13);
+            this.tooltipLabel.TabIndex = 13;
+            this.tooltipLabel.Text = "Show tooltip when excute Powershell script";
+            // 
+            // enableLabel
+            // 
+            this.enableLabel.AutoSize = true;
+            this.enableLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.enableLabel.Location = new System.Drawing.Point(26, 75);
+            this.enableLabel.Name = "enableLabel";
+            this.enableLabel.Size = new System.Drawing.Size(242, 13);
+            this.enableLabel.TabIndex = 12;
+            this.enableLabel.Text = "Allow IPMI module to control Windows Powershell";
             // 
             // statusBtn
             // 
@@ -614,24 +649,16 @@
             this.aboutTab.Text = "About";
             this.aboutTab.UseVisualStyleBackColor = true;
             // 
-            // logGroupBox
-            // 
-            this.logGroupBox.Controls.Add(this.logTextBox);
-            this.logGroupBox.Location = new System.Drawing.Point(3, 341);
-            this.logGroupBox.Name = "logGroupBox";
-            this.logGroupBox.Size = new System.Drawing.Size(570, 121);
-            this.logGroupBox.TabIndex = 1;
-            this.logGroupBox.TabStop = false;
-            this.logGroupBox.Text = "Log";
-            // 
             // logTextBox
             // 
-            this.logTextBox.Location = new System.Drawing.Point(10, 19);
+            this.logTextBox.AcceptsReturn = true;
+            this.logTextBox.AcceptsTab = true;
+            this.logTextBox.Location = new System.Drawing.Point(3, 6);
             this.logTextBox.Multiline = true;
             this.logTextBox.Name = "logTextBox";
             this.logTextBox.ReadOnly = true;
-            this.logTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.logTextBox.Size = new System.Drawing.Size(552, 91);
+            this.logTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.logTextBox.Size = new System.Drawing.Size(559, 138);
             this.logTextBox.TabIndex = 0;
             // 
             // notifyIcon
@@ -664,42 +691,54 @@
             this.closeToolStripMenuItem.Text = "Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
-            // enableLabel
+            // tabControl1
             // 
-            this.enableLabel.AutoSize = true;
-            this.enableLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.enableLabel.Location = new System.Drawing.Point(26, 75);
-            this.enableLabel.Name = "enableLabel";
-            this.enableLabel.Size = new System.Drawing.Size(242, 13);
-            this.enableLabel.TabIndex = 12;
-            this.enableLabel.Text = "Allow IPMI module to control Windows Powershell";
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Location = new System.Drawing.Point(4, 342);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(573, 176);
+            this.tabControl1.TabIndex = 10;
             // 
-            // tooltipLabel
+            // tabPage1
             // 
-            this.tooltipLabel.AutoSize = true;
-            this.tooltipLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.tooltipLabel.Location = new System.Drawing.Point(23, 113);
-            this.tooltipLabel.Name = "tooltipLabel";
-            this.tooltipLabel.Size = new System.Drawing.Size(211, 13);
-            this.tooltipLabel.TabIndex = 13;
-            this.tooltipLabel.Text = "Show tooltip when excute Powershell script";
+            this.tabPage1.Controls.Add(this.logTextBox);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(565, 150);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Log";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // startupLabel
+            // tabPage2
             // 
-            this.startupLabel.AutoSize = true;
-            this.startupLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.startupLabel.Location = new System.Drawing.Point(23, 149);
-            this.startupLabel.Name = "startupLabel";
-            this.startupLabel.Size = new System.Drawing.Size(366, 13);
-            this.startupLabel.TabIndex = 14;
-            this.startupLabel.Text = "Write registry entry to SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+            this.tabPage2.Controls.Add(this.debugTextBox);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(565, 150);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Debug";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // debugTextBox
+            // 
+            this.debugTextBox.Location = new System.Drawing.Point(0, 4);
+            this.debugTextBox.Multiline = true;
+            this.debugTextBox.Name = "debugTextBox";
+            this.debugTextBox.ReadOnly = true;
+            this.debugTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.debugTextBox.Size = new System.Drawing.Size(562, 140);
+            this.debugTextBox.TabIndex = 0;
             // 
             // mainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(577, 492);
-            this.Controls.Add(this.logGroupBox);
+            this.ClientSize = new System.Drawing.Size(577, 544);
+            this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.statusStrip);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
@@ -722,9 +761,12 @@
             this.mqttConfigGroupBox.PerformLayout();
             this.wifiConfigGroupBox.ResumeLayout(false);
             this.wifiConfigGroupBox.PerformLayout();
-            this.logGroupBox.ResumeLayout(false);
-            this.logGroupBox.PerformLayout();
             this.trayMenu.ResumeLayout(false);
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -736,7 +778,6 @@
         private System.Windows.Forms.TabPage appConfTab;
         private System.Windows.Forms.TabPage moduleConfTab;
         private System.Windows.Forms.TabPage aboutTab;
-        private System.Windows.Forms.GroupBox logGroupBox;
         private System.Windows.Forms.GroupBox appConfGroupBox;
         private System.Windows.Forms.Label baudLabel;
         private System.Windows.Forms.Button saveBtn;
@@ -790,6 +831,10 @@
         private System.Windows.Forms.Label startupLabel;
         private System.Windows.Forms.Label tooltipLabel;
         private System.Windows.Forms.Label enableLabel;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TextBox debugTextBox;
     }
 }
 
