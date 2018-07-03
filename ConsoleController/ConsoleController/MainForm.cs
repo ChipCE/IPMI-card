@@ -205,6 +205,10 @@ namespace ConsoleController
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (serialController != null)
+            {
+                serialController.disconnect();
+            }
             Application.Exit();
         }
 
