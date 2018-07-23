@@ -119,7 +119,7 @@
             // statusLabel
             // 
             this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(26, 17);
+            this.statusLabel.Size = new System.Drawing.Size(25, 17);
             this.statusLabel.Text = "Idle";
             // 
             // tabControl
@@ -176,7 +176,7 @@
             this.startupLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.startupLabel.Location = new System.Drawing.Point(23, 149);
             this.startupLabel.Name = "startupLabel";
-            this.startupLabel.Size = new System.Drawing.Size(366, 13);
+            this.startupLabel.Size = new System.Drawing.Size(370, 13);
             this.startupLabel.TabIndex = 14;
             this.startupLabel.Text = "Write registry entry to SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
             // 
@@ -253,9 +253,9 @@
             this.tooltipCheckbox.AutoSize = true;
             this.tooltipCheckbox.Location = new System.Drawing.Point(10, 93);
             this.tooltipCheckbox.Name = "tooltipCheckbox";
-            this.tooltipCheckbox.Size = new System.Drawing.Size(197, 17);
+            this.tooltipCheckbox.Size = new System.Drawing.Size(203, 17);
             this.tooltipCheckbox.TabIndex = 4;
-            this.tooltipCheckbox.Text = "Show tooltip when excute command";
+            this.tooltipCheckbox.Text = "Show tooltip when execute command";
             this.tooltipCheckbox.UseVisualStyleBackColor = true;
             // 
             // baudLabel
@@ -675,19 +675,19 @@
             this.showToolStripMenuItem,
             this.closeToolStripMenuItem});
             this.trayMenu.Name = "trayMenu";
-            this.trayMenu.Size = new System.Drawing.Size(104, 48);
+            this.trayMenu.Size = new System.Drawing.Size(101, 48);
             // 
             // showToolStripMenuItem
             // 
             this.showToolStripMenuItem.Name = "showToolStripMenuItem";
-            this.showToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.showToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.showToolStripMenuItem.Text = "Show";
             this.showToolStripMenuItem.Click += new System.EventHandler(this.showToolStripMenuItem_Click);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.closeToolStripMenuItem.Text = "Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 

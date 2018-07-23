@@ -323,6 +323,7 @@ namespace ConsoleController
                     statusLabel.Text = "Connected: " + config.port;
                     logTextBox.AppendText("Connected to : "+ config.port+"\n");
                     enableConfigControl(true);
+
                 }
                 else
                 {

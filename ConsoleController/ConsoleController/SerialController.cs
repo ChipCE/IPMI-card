@@ -71,13 +71,13 @@ namespace ConsoleController
                     //tray tooltip
                     if (notifyIcon != null && config.tooltip && config.enable && connected)
                     {
-                        notifyIcon.ShowBalloonTip(config.duration, "Console controller","Excute command:" + msg, System.Windows.Forms.ToolTipIcon.Info);
+                        notifyIcon.ShowBalloonTip(config.duration, "Console controller","Execute command:" + msg, System.Windows.Forms.ToolTipIcon.Info);
                     }
 
                     if (config.enable && connected)
                     {
-                        appendTextbox("Trying to excute command: " + msg + "\n");
-                        //try to excute it
+                        appendTextbox("Trying to execute command: " + msg + "\n");
+                        //try to execute it
                         StringCollection resultCollection = console.excuteCommand(msg);
                         //display the output
                         foreach(string result in resultCollection)
