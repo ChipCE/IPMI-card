@@ -1,6 +1,6 @@
-#include "HardwareControl.h"
+#include "HardwareController.h"
 
-HardwareControl::HardwareControl()
+HardwareController::HardwareController()
 {
     //define GPIO mode here
     pinMode(SENSE,INPUT);
@@ -10,24 +10,25 @@ HardwareControl::HardwareControl()
     digitalWrite(RELAY,LOW);
 
     //reset onTime
-    onTime = 0;
+    startTime = 0;
+    //Serial.begin(115200);
 }
 
-void HardwareControl::nonBlockDelay(int millisecond)
+void HardwareController::nonBlockDelay(unsigned long millisecond)
 {
     unsigned long endTime = millis() + millisecond;
     while(millis()<endTime)
         yield();
 }
 
-bool HardwareControl::getPowerState()
+bool HardwareController::getPowerState()
 {
     if(digitalRead(SENSE)==HIGH)
         return false;
     return true;
 }
 
-bool HardwareControl::reboot()
+bool HardwareController::reboot()
 {
     //if pc off, just turn it on
     if(!getPowerState())
@@ -40,12 +41,12 @@ bool HardwareControl::reboot()
 }
 
 
-bool HardwareControl::shutdown()
+bool HardwareController::shutdown()
 {
     if(!getPowerState())
         return true;
     //push button and release
-    unsigned long endTime = millis() + BUTTON_CLICK_INTERVAL*1000;
+    unsigned long endTime = millis() + BUTTON_CLICK_INTERVAL;
     digitalWrite(RELAY,HIGH);
     while(millis()<endTime)
         yield();
@@ -58,7 +59,7 @@ bool HardwareControl::shutdown()
 }
 
 
-bool HardwareControl::forceShutdown()
+bool HardwareController::forceShutdown()
 {
     if(!getPowerState())
         return true;
@@ -71,12 +72,12 @@ bool HardwareControl::forceShutdown()
 }
 
 
-bool HardwareControl::powerOn()
+bool HardwareController::powerOn()
 {
     if(getPowerState())
         return true;
     //push button and release
-    unsigned long endTime = millis() + BUTTON_CLICK_INTERVAL*1000;
+    unsigned long endTime = millis() + BUTTON_CLICK_INTERVAL;
     digitalWrite(RELAY,HIGH);
     while(millis()<endTime)
         yield();
@@ -88,7 +89,7 @@ bool HardwareControl::powerOn()
     return getPowerState();
 }
 
-void HardwareControl::update()
+void HardwareController::update()
 {
     if(getPowerState())
     {
@@ -100,7 +101,7 @@ void HardwareControl::update()
 }
 
 
-unsigned long HardwareControl::getOnTime()
+unsigned long HardwareController::getOnTime()
 {
     if(startTime == 0)
         return 0;

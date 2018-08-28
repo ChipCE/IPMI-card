@@ -1,10 +1,10 @@
-#ifndef __HARDWARE_CONTROL_H
-#define __HARDWARE_CONTROL_H
+#ifndef __HARDWARE_CONTROLLER_H
+#define __HARDWARE_CONTROLLER_H
 #include <Arduino.h>
 
 //define PIN
-#define SENSE 0
-#define RELAY 1
+#define SENSE 13
+#define RELAY 12
 
 //define time threshold
 #define SHUTDOWN_TIMEOUT 120
@@ -12,12 +12,12 @@
 #define FORCE_SHUTDOWN_TIMEOUT 15
 #define BUTTON_CLICK_INTERVAL 300
 
-class HardwareControl
+class HardwareController
 {
     private:
         unsigned long startTime;
     public:
-        HardwareControl();
+        HardwareController();
         void nonBlockDelay(unsigned long millisecond);
         bool getPowerState();
         bool reboot();
