@@ -65,7 +65,7 @@ void setup()
 
     //enable serial controller
     delay(100);
-    ipmiSerialController = IpmiSerialController();
+    ipmiSerialController = IpmiSerialController(_shellReportTopic,&mqttClient);
 
     if(DEBUG)
       Serial.println("Connected!!!");
@@ -169,15 +169,85 @@ void callback(char *topic, byte *payload, unsigned int length)
 
 bool handleHardwareCommand(char* cmd)
 {
-  return true;
+  if (strcmp(cmd, "status") == 0)
+  {
+    //report device status here
+    return true;
+  }
+
+  if (strcmp(cmd, "shutdown") == 0)
+  {
+    mqttClient.publish(_hardwareReportTopic.c_str(), "Execute IPMI shutdown command...");
+    if(hwController.shutdown())
+      mqttClient.publish(_hardwareReportTopic.c_str(), "Shutdown success!");
+    else
+      mqttClient.publish(_hardwareReportTopic.c_str(), "Shutdown failed!");
+    return true;
+  }
+
+  if (strcmp(cmd, "reboot") == 0)
+  {
+    mqttClient.publish(_hardwareReportTopic.c_str(), "Execute IPMI reboot command...");
+    if(hwController.reboot())
+      mqttClient.publish(_hardwareReportTopic.c_str(), "Reboot success!");
+    else
+      mqttClient.publish(_hardwareReportTopic.c_str(), "Reboot failed!");
+    return true;
+  }
+
+  if (strcmp(cmd, "force-shutdown") == 0)
+  {
+    mqttClient.publish(_hardwareReportTopic.c_str(), "Execute IPMI force-shutdown command...");
+    if(hwController.forceShutdown())
+      mqttClient.publish(_hardwareReportTopic.c_str(), "Force-shutdown success!");
+    else
+      mqttClient.publish(_hardwareReportTopic.c_str(), "Force-shutdown failed!");
+    return true;
+  }
+
+  if (strcmp(cmd, "power-on") == 0)
+  {
+    mqttClient.publish(_hardwareReportTopic.c_str(), "Execute IPMI power-on command...");
+    if(hwController.powerOn())
+      mqttClient.publish(_hardwareReportTopic.c_str(), "Power-on success!");
+    else
+      mqttClient.publish(_hardwareReportTopic.c_str(), "Power-on failed!");
+    return true;
+  }
+
+  return false;
 }
 
 bool handleShellCommand(char* cmd)
 {
+  mqttClient.publish(_shellReportTopic.c_str(), "Trying to execute command : ");
+  mqttClient.publish(_shellReportTopic.c_str(), cmd);
+  ipmiSerialController.executeShellCommand(cmd);
   return true;
 }
 
 bool handleIpmiCommand(char* cmd)
 {
+  if(strcmp(cmd,"reboot")==0)
+  {
+    mqttClient.publish(_ipmiReportTopic.c_str(), "IPMI : Reboot...");
+    reboot();
+    return true;
+  }
+
+  if(strcmp(cmd,"clear")==0)
+  {
+    mqttClient.publish(_ipmiReportTopic.c_str(), "IPMI : Clear al setting and reboot...");
+    clear();
+    return true;
+  }
+
+  if(strcmp(cmd,"config")==0)
+  {
+    mqttClient.publish(_ipmiReportTopic.c_str(), "IPMI : Reboot to config mode...");
+    rebootToApMode();
+    return true;
+  }
+
   return true;
 }

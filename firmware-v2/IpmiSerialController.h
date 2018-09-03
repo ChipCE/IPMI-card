@@ -2,21 +2,23 @@
 #define __IPMI_SERIAL_CONTROLLER_H
 
 #include <Arduino.h>
-#include "Boot.h"
+#include <PubSubClient.h>
+#include <Boot.h>
 
 class IpmiSerialController
 {
     private:
         String serialBuffer;
-        bool bufferReady;
-    public:
+        String shellReportTopic;
+        PubSubClient *mqttClient;
+      public:
         IpmiSerialController();
+        IpmiSerialController(String topic,PubSubClient *client);
         void handleSerial();
         bool executeCommand();
-        String readLine();
-        void executeShellCommand(char* cmd);
+        void shellCommandReport();
+        void executeShellCommand(char *cmd);
 };
-
 
 #endif
 
