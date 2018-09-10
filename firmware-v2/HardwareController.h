@@ -5,6 +5,7 @@
 //define PIN
 #define SENSE 13
 #define RELAY 12
+#define LED 2
 
 //define time threshold
 #define SHUTDOWN_TIMEOUT 120
@@ -15,7 +16,8 @@
 class HardwareController
 {
     private:
-        unsigned long startTime;
+        bool ledStatus;
+        unsigned long hearbeatTimer;
     public:
         HardwareController();
         void nonBlockDelay(unsigned long millisecond);
@@ -24,8 +26,8 @@ class HardwareController
         bool shutdown();
         bool forceShutdown();
         bool powerOn();
-        void update();
-        unsigned long getOnTime();
+        void switchLed(bool status);
+        void heartBeat();
 };
 
 #endif

@@ -10,13 +10,18 @@ class IpmiSerialController
     private:
         String serialBuffer;
         String shellReportTopic;
+        String ipmiReportTopic;
         PubSubClient *mqttClient;
+        //Execute serial command from host (reboot,clear,config)
+        bool executeCommand();
+        //Report output from host to mqtt server
+        void shellCommandReport();
       public:
         IpmiSerialController();
-        IpmiSerialController(String topic,PubSubClient *client);
+        IpmiSerialController(String shellTopic,String ipmiTopic,PubSubClient *client);
+        //wait for serial input and merge chars to String
         void handleSerial();
-        bool executeCommand();
-        void shellCommandReport();
+        //Send serial comman to host
         void executeShellCommand(char *cmd);
 };
 

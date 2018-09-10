@@ -10,10 +10,11 @@ IpmiSerialController::IpmiSerialController()
         char t = Serial.read();
 }
 
-IpmiSerialController::IpmiSerialController(String topic,PubSubClient *client)
+IpmiSerialController::IpmiSerialController(String shellTopic,String ipmiTopic,PubSubClient *client)
 {
     //get mqtt controls
-    shellReportTopic = topic;
+    shellReportTopic = shellTopic;
+    ipmiReportTopic = ipmiTopic;
     mqttClient = client;
 
     //
@@ -47,7 +48,7 @@ bool IpmiSerialController::executeCommand()
 {
     if (strncmp(serialBuffer.c_str(), "#$> reboot", 10) == 0)
     {
-        Serial.println("#$< Reboot...");
+        mqttClient->publish(ipmiReportTopic.c_str(), "Reboot...");
         serialBuffer = "";
         ESP.restart();
         return true;
@@ -55,7 +56,7 @@ bool IpmiSerialController::executeCommand()
 
     if (strncmp(serialBuffer.c_str(), "#$> config", 10) == 0)
     {
-        Serial.println("#$< Reboot to config mode...");
+        mqttClient->publish(ipmiReportTopic.c_str(), "Reboot to config mode...");
         serialBuffer = "";
         rebootToApMode();
         return true;
@@ -63,7 +64,7 @@ bool IpmiSerialController::executeCommand()
 
     if (strncmp(serialBuffer.c_str(), "#$> clear", 9) == 0)
     {
-        Serial.println("#$< Clear all setting and reboot...");
+        mqttClient->publish(ipmiReportTopic.c_str(), "Clear all setting and reboot...");
         serialBuffer = "";
         clear();
         ESP.restart();
@@ -75,17 +76,16 @@ bool IpmiSerialController::executeCommand()
     return true;
 }
 
-
 void IpmiSerialController::shellCommandReport()
 {
     //send result to shell report topic 
     mqttClient->publish(shellReportTopic.c_str(), serialBuffer.c_str());
+
     //clear used buffer
     serialBuffer = "";
 }
 
 void IpmiSerialController::executeShellCommand(char *cmd)
 {
-    Serial.print("##> ");
     Serial.println(cmd);
 }

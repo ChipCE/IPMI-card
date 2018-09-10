@@ -8,11 +8,15 @@
 #define DEBUG 1
 #define BUFFER_LENGTH 256
 
+//Controller
 Config conf;
 HardwareController hwController;
 IpmiSerialController ipmiSerialController;
 WiFiClient espClient;
 PubSubClient mqttClient;
+
+//Global var
+bool powerState;
 
 //--------------MQTT Topic-----------------------------------------
 String _hardwareCotrolTopic;
@@ -21,6 +25,7 @@ String _shellCommandTopic;
 String _shellReportTopic;
 String _ipmiControlTopic;
 String _ipmiReportTopic;
+String _powerStateReport;
 
 //---------------FUNCTION--------------------------------------------
 void callback(char *topic, byte *payload, unsigned int length);
@@ -28,6 +33,7 @@ void reconnect();
 bool handleHardwareCommand(char* cmd);
 bool handleShellCommand(char* cmd);
 bool handleIpmiCommand(char* cmd);
+void updatePowerState(bool forceUpdate);
 
 //---------------MAIN PROG-------------------------------------------
 void setup()
@@ -41,15 +47,18 @@ void setup()
   //create default object
   WiFiMan wman = WiFiMan();
   wman.setDebug(true);
+  hwController = HardwareController();
 
-  //Start Wifi manager
+  //get current power state
+  powerState = hwController.getPowerState();
+
+  //set status led ON and Start Wifi manager
+  hwController.switchLed(true);
   wman.start();
 
   if (wman.getConfig(&conf))
   {
     //Connected :3
-    hwController = HardwareController();
-
     //set MQTT Server hand callback
     mqttClient = PubSubClient(espClient);
     mqttClient.setServer(conf.mqttAddr, conf.mqttPort);
@@ -62,10 +71,11 @@ void setup()
     _shellReportTopic = String(conf.mqttPub) + "/ShellReport";
     _ipmiControlTopic = String(conf.mqttSub) + "/IpmiControl";
     _ipmiReportTopic = String(conf.mqttPub) + "/IpmiReport";
+    _powerStateReport = String(conf.mqttPub) + "/PowerStateReport";
 
     //enable serial controller
     delay(100);
-    ipmiSerialController = IpmiSerialController(_shellReportTopic,&mqttClient);
+    ipmiSerialController = IpmiSerialController(_shellReportTopic,_ipmiReportTopic,&mqttClient);
 
     if(DEBUG)
       Serial.println("Connected!!!");
@@ -73,7 +83,9 @@ void setup()
   else
   {
     //Connect failed or config timeout , put the device to sleep mode
+    hwController.switchLed(false);
     ESP.deepSleep(0);
+
   }
 }
 
@@ -90,7 +102,12 @@ void loop()
   mqttClient.loop();
   //handle serial
   ipmiSerialController.handleSerial();
+  //blink status led
+  hwController.heartBeat();
+  //update power state
+  updatePowerState(false);
 }
+
 
 //-------------------------------------------
 void mqttReconnect()
@@ -98,6 +115,8 @@ void mqttReconnect()
   //check connection status
   if (!mqttClient.connected())
   {
+    //turn status led ON 
+    hwController.switchLed(true);
     while (!mqttClient.connected())
     {
       if(DEBUG) 
@@ -129,6 +148,8 @@ void mqttReconnect()
       }
     }
   }
+  //re-update power status
+  updatePowerState(true);
 }
 
 void callback(char *topic, byte *payload, unsigned int length)
@@ -250,4 +271,17 @@ bool handleIpmiCommand(char* cmd)
   }
 
   return true;
+}
+
+void updatePowerState(bool forceUpdate)
+{
+  bool currentPowerState = hwController.getPowerState();
+  if( (powerState != currentPowerState) || forceUpdate )
+  {
+    powerState = currentPowerState;
+    if(powerState)
+      mqttClient.publish(_powerStateReport.c_str(), "1");
+    else
+      mqttClient.publish(_powerStateReport.c_str(), "0");
+  }
 }

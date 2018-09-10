@@ -5,13 +5,15 @@ HardwareController::HardwareController()
     //define GPIO mode here
     pinMode(SENSE,INPUT);
     pinMode(RELAY,OUTPUT);
+    pinMode(LED,OUTPUT);
 
     //default relay state
     digitalWrite(RELAY,LOW);
+    digitalWrite(LED,LOW);
 
-    //reset onTime
-    startTime = 0;
-    //Serial.begin(115200);
+    ledStatus = false;
+    
+    hearbeatTimer = millis();
 }
 
 void HardwareController::nonBlockDelay(unsigned long millisecond)
@@ -89,22 +91,21 @@ bool HardwareController::powerOn()
     return getPowerState();
 }
 
-void HardwareController::update()
+
+void HardwareController::switchLed(bool status)
 {
-    if(getPowerState())
-    {
-        if(startTime == 0)
-            startTime = millis();
-    }
+    ledStatus = status;
+    if(ledStatus)
+        digitalWrite(LED,HIGH);
     else
-        startTime = 0;
+        digitalWrite(LED,LOW);
 }
 
-
-unsigned long HardwareController::getOnTime()
+void HardwareController::heartBeat()
 {
-    if(startTime == 0)
-        return 0;
-    return (millis()-startTime)/1000;
+    if(millis()-hearbeatTimer >= 1000)
+    {
+        hearbeatTimer = millis();
+        switchLed(!ledStatus);
+    }
 }
-

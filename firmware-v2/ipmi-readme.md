@@ -10,6 +10,7 @@ IPMI-root/
 - /ShellReport
 - /IpmiControl
 - /IpmiReport
+- /PowerStateReport
 
 ## Supported commands
 
