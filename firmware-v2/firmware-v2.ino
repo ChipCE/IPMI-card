@@ -26,6 +26,7 @@ String _shellReportTopic;
 String _ipmiControlTopic;
 String _ipmiReportTopic;
 String _powerStateReport;
+String _connectionStatus;
 
 //---------------FUNCTION--------------------------------------------
 void callback(char *topic, byte *payload, unsigned int length);
@@ -72,6 +73,7 @@ void setup()
     _ipmiControlTopic = String(conf.mqttSub) + "/IpmiControl";
     _ipmiReportTopic = String(conf.mqttPub) + "/IpmiReport";
     _powerStateReport = String(conf.mqttPub) + "/PowerStateReport";
+    _connectionStatus = String(conf.mqttPub) + "/ConnectionStatus";
 
     //enable serial controller
     delay(100);
@@ -112,39 +114,41 @@ void loop()
 //-------------------------------------------
 void mqttReconnect()
 {
+  //_connectionStatus
   //check connection status
-  if (!mqttClient.connected())
+  while (!mqttClient.connected())
   {
-    //turn status led ON 
     hwController.switchLed(true);
-    while (!mqttClient.connected())
+    if (DEBUG)
+      Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    bool connectResult;
+    if(strcmp(conf.mqttUsername,"")==0)
+      connectResult = mqttClient.connect(conf.mqttId,_connectionStatus.c_str(),2,0,"Offline");
+    else
+      connectResult = mqttClient.connect(conf.mqttId,conf.mqttUsername,conf.mqttPasswd,_connectionStatus.c_str(),2,0,"Offline");
+    if (connectResult)
     {
-      if(DEBUG) 
-        Serial.print("Attempting MQTT connection...");
-      // Attempt to connect
-      if (mqttClient.connect(conf.mqttId))
-      {
-        if(DEBUG) 
-          Serial.println("connected to MQTT server");
+      if (DEBUG)
+        Serial.println("connected to MQTT server");
 
-        //(re)subscribe
-        mqttClient.subscribe(_hardwareCotrolTopic.c_str());
-        mqttClient.subscribe(_shellCommandTopic.c_str());
-        mqttClient.subscribe(_ipmiControlTopic.c_str());
+      //(re)subscribe
+      mqttClient.subscribe(_hardwareCotrolTopic.c_str());
+      mqttClient.subscribe(_shellCommandTopic.c_str());
+      mqttClient.subscribe(_ipmiControlTopic.c_str());
 
-        //send hello 
-        mqttClient.publish(_ipmiReportTopic.c_str(), "Generic IPMI : Hello, World!");
-      }
-      else
+      //send hello
+      mqttClient.publish(_connectionStatus.c_str(), "Online");
+    }
+    else
+    {
+      if (DEBUG)
       {
-        if (DEBUG)
-        {
-          Serial.print("failed, rc=");
-          Serial.print(mqttClient.state());
-          Serial.println(" try again in 5 seconds");
-          // Wait 5 seconds before retrying
-          delay(5000);
-        }
+        Serial.print("failed, rc=");
+        Serial.print(mqttClient.state());
+        Serial.println(" try again in 5 seconds");
+        // Wait 5 seconds before retrying
+        delay(5000);
       }
     }
   }
