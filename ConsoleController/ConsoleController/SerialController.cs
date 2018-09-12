@@ -53,16 +53,25 @@ namespace ConsoleController
             return true;
         }
 
+        bool isCommandType(String msg)
+        {
+            if ((msg[0] == '#' && (msg[1] == '<' || msg[1] == '>' || msg[1] == '_' || msg[1] == '$') && (msg[2] == '<' || msg[2] == '>' || msg[2] == '_')) || (msg=="\n") || (msg=="\r"))
+                return false;
+            return true;
+        }
+
+        //process data from module , must get msg type COMMAND or DEBUG
         private void processData(object sender,SerialDataReceivedEventArgs e)
         {
             try
             {
                 string msg = serial.ReadLine();
                 Console.WriteLine("Received msg : " + msg);
-                if(msg[0]!='#' && msg[0] != '$' && msg[0]!= '\r' && msg[0] != '\n' && msg.Length>0)
+                if (isCommandType(msg))
                 {
-                    //if msg are not the devide debug
-                    if(textbox!=null && connected)
+                    //execute
+                    //append log textbox
+                    if (textbox != null && connected)
                     {
                         //textbox.AppendText("Received command : " + msg + "\n");
                         appendTextbox("Received command : " + msg + "\n");
@@ -71,33 +80,36 @@ namespace ConsoleController
                     //tray tooltip
                     if (notifyIcon != null && config.tooltip && config.enable && connected)
                     {
-                        notifyIcon.ShowBalloonTip(config.duration, "Console controller","Execute command:" + msg, System.Windows.Forms.ToolTipIcon.Info);
+                        notifyIcon.ShowBalloonTip(config.duration, "Console controller", "Execute command:" + msg, System.Windows.Forms.ToolTipIcon.Info);
                     }
 
                     if (config.enable && connected)
                     {
+                        //console debug
+                        Console.WriteLine("##> " + msg);
+
                         appendTextbox("Trying to execute command: " + msg + "\n");
                         //try to execute it
                         StringCollection resultCollection = console.excuteCommand(msg);
                         //display the output
-                        foreach(string result in resultCollection)
+                        foreach (string result in resultCollection)
                         {
+                            //append result to log textbox
                             appendTextbox(result + "\n");
+                            //send back result to device via serial
+                            serial.WriteLine(result);
+                            //console debug
+                            Console.WriteLine("##< " + result);
                         }
-                        //send back result to device via serial
-
                     }
-
                 }
                 else
                 {
-                    if(msg[0]=='$')
-                        appendTextbox(msg + "\n");
-                    if (msg[0] == '#')
-                        appendDebugTextbox(msg + "\n");
+                    //append debug textbox
+                    appendDebugTextbox(msg + "\n");
                 }
             }
-            catch(Exception exp)
+            catch (Exception exp)
             {
                 Console.WriteLine(exp.ToString());
             }

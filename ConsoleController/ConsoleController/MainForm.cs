@@ -389,96 +389,31 @@ namespace ConsoleController
             }
         }
 
-        private void moduleRebootBtn_Click(object sender, EventArgs e)
-        {
-            //send reboot command via serial
-            if(serialController.connected)
-            {
-
-            }
-        }
-
-        private void moduleClearBtn_Click(object sender, EventArgs e)
-        {
-            //send clear config and reboot command to module via serial
-            if(serialController.connected)
-            {
-
-            }
-        }
-
-        private void moduleSaveBtn_Click(object sender, EventArgs e)
-        {
-            //send new config and reboot command to module via serial
-            if(serialController.connected)
-            {
-                //check current args
-                string result = checkModuleConfig();
-                if (result == "")
-                {
-                    //send it
 
 
-                    showDialog("New setting was sent via UART", "Sent");
-                }
-                else
-                    showDialog(result, "Error");
-            }
-        }
 
 
         private void enableConfigControl(bool enable)
         {
             if(enable)
             {
-                moduleClearBtn.Enabled = true;
-                moduleRebootBtn.Enabled = true;
-                moduleSaveBtn.Enabled = true;
                 statusBtn.Enabled = true;
                 disconnectBtn.Enabled = true;
+                rebootBtn.Enabled = true;
+                configBtn.Enabled = true;
+                clearBtn.Enabled = true;
             }
             else
             {
-                moduleClearBtn.Enabled = false;
-                moduleRebootBtn.Enabled = false;
-                moduleSaveBtn.Enabled = false;
+
                 statusBtn.Enabled = false;
                 disconnectBtn.Enabled = false;
+                rebootBtn.Enabled = false;
+                configBtn.Enabled = false;
+                clearBtn.Enabled = false;
             }
         }
 
-        private string checkModuleConfig()
-        {
-            //empty value check
-            if (wifiSsidTextbox.Text == "")
-                return "Invalid SSID";
-
-
-             if(mqttServerTextbox.Text == "")
-                return "Invalid MQTT server";
-
-            if(mqttPortTextbox.Text == "")
-                return "Invalid MQTT port";
-
-            if(mqttSubTextbox.Text == "")
-                return "Invalid MQTT sub";
-
-            if(mqttPubTextbox.Text == "")
-                return "Invalid MQTT pub";
-
-
-
-
-            //number only check
-            int tmp;
-            if (!Int32.TryParse(mqttPortTextbox.Text, out tmp))
-                return "Invalid MQTT port";
-
-            if ((passwdConfrimTextbox1.Text != "" || passwdConfirmTextbox2.Text != "") && (passwdConfirmTextbox2.Text != passwdConfrimTextbox1.Text))
-                return "Confirm password not matched";
-
-            return "";
-        }
 
         private void showDialog(string message,string caption)
         {
@@ -499,6 +434,21 @@ namespace ConsoleController
         {
             if (serialController.connected)
                 serialController.send("{\"command\":\"status\",\"args\":\"none\"}");
+        }
+
+        private void rebootBtn_Click(object sender, EventArgs e)
+        {
+            serialController.send("#$> reboot");
+        }
+
+        private void clearBtn_Click(object sender, EventArgs e)
+        {
+            serialController.send("#$> clear");
+        }
+
+        private void configBtn_Click(object sender, EventArgs e)
+        {
+            serialController.send("#$> config");
         }
     }
 }

@@ -19,3 +19,4 @@ C:\Users\Chip\Documents\GitHub\IPMI-card\ConsoleController\ConsoleController\obj
 C:\Users\Chip\Documents\GitHub\IPMI-card\ConsoleController\ConsoleController\obj\Debug\ConsoleController.pdb
 C:\Users\Chip\Documents\GitHub\IPMI-card\ConsoleController\ConsoleController\bin\Debug\System.Management.Automation.dll
 C:\Users\Chip\Documents\GitHub\IPMI-card\ConsoleController\ConsoleController\obj\Debug\ConsoleController.csproj.CopyComplete
+C:\Users\Chip\Documents\GitHub\IPMI-card\ConsoleController\ConsoleController\obj\Debug\ConsoleController.csprojAssemblyReference.cache
