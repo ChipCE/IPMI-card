@@ -402,6 +402,9 @@ namespace ConsoleController
                 rebootBtn.Enabled = true;
                 configBtn.Enabled = true;
                 clearBtn.Enabled = true;
+
+                connectBtn.Enabled = false;
+                saveBtn.Enabled = false;
             }
             else
             {
@@ -411,6 +414,9 @@ namespace ConsoleController
                 rebootBtn.Enabled = false;
                 configBtn.Enabled = false;
                 clearBtn.Enabled = false;
+
+                connectBtn.Enabled = true;
+                saveBtn.Enabled = true;
             }
         }
 

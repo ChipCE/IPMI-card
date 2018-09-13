@@ -90,8 +90,11 @@ namespace ConsoleController
 
                         appendTextbox("Trying to execute command: " + msg + "\n");
                         //try to execute it
+                        //StringCollection resultCollection = console.excuteCommand(msg);
                         StringCollection resultCollection = console.excuteCommand(msg);
+
                         //display the output
+                        serial.WriteLine("\n##> " + msg);
                         foreach (string result in resultCollection)
                         {
                             //append result to log textbox
@@ -99,7 +102,7 @@ namespace ConsoleController
                             //send back result to device via serial
                             serial.WriteLine(result);
                             //console debug
-                            Console.WriteLine("##< " + result);
+                            Console.WriteLine(result);
                         }
                     }
                 }

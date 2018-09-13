@@ -7,11 +7,18 @@ using System.Management.Automation;
 using System.Collections.ObjectModel;
 using System.Collections;
 using System.Collections.Specialized;
+using System.Management.Automation.Runspaces;
 
 namespace ConsoleController
 {
     class ConsoleController
     {
+
+        public ConsoleController()
+        {
+
+        }
+
         public StringCollection excuteCommand(string command)
         {
             using (PowerShell PowerShellInstance = PowerShell.Create())
@@ -41,7 +48,6 @@ namespace ConsoleController
 
                 if(outputCollection.Count >0 )
                 {
-                    resultCollection.Add("Result");
                     foreach (PSObject outputItem in outputCollection)
                     {
                         //TODO: handle/process the output items if required
@@ -62,5 +68,7 @@ namespace ConsoleController
                 return resultCollection;
             }
         }
+
+        
     }
 }
