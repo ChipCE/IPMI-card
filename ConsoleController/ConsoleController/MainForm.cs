@@ -23,7 +23,6 @@ namespace ConsoleController
             notifyIcon.Visible = true;
         }
 
-
         private void MainForm_Load(object sender, EventArgs e)
         {
             listComPort();
@@ -75,7 +74,6 @@ namespace ConsoleController
             }
         }
 
-
         bool listComPort()
         {
             comPortComboBox.SelectionLength = 0;
@@ -114,8 +112,6 @@ namespace ConsoleController
                 success = false;
             }
            
-
-
             //baud
             index = 0;
             foreach (var item in baudComboBox.Items)
@@ -389,15 +385,10 @@ namespace ConsoleController
             }
         }
 
-
-
-
-
         private void enableConfigControl(bool enable)
         {
             if(enable)
             {
-                statusBtn.Enabled = true;
                 disconnectBtn.Enabled = true;
                 rebootBtn.Enabled = true;
                 configBtn.Enabled = true;
@@ -408,8 +399,6 @@ namespace ConsoleController
             }
             else
             {
-
-                statusBtn.Enabled = false;
                 disconnectBtn.Enabled = false;
                 rebootBtn.Enabled = false;
                 configBtn.Enabled = false;
@@ -419,7 +408,6 @@ namespace ConsoleController
                 saveBtn.Enabled = true;
             }
         }
-
 
         private void showDialog(string message,string caption)
         {
@@ -439,22 +427,55 @@ namespace ConsoleController
         private void statusBtn_Click(object sender, EventArgs e)
         {
             if (serialController.connected)
-                serialController.send("{\"command\":\"status\",\"args\":\"none\"}");
+                serialController.send("#$> status");
         }
 
         private void rebootBtn_Click(object sender, EventArgs e)
         {
-            serialController.send("#$> reboot");
+            var confirmResult = MessageBox.Show("Are you sure to reboot IPMI module ?\nCurrent connection will be lost!","Confirm reboot !!",MessageBoxButtons.OKCancel);
+            if(confirmResult == DialogResult.OK)
+            {
+                if (serialController.connected)
+                    serialController.send("#$> reboot");
+                serialController.disconnect();
+                Console.WriteLine("Disconnected!");
+                statusLabel.Text = "Idle";
+                enableConfigControl(false);
+            }
+
         }
 
         private void clearBtn_Click(object sender, EventArgs e)
         {
-            serialController.send("#$> clear");
+            var confirmResult = MessageBox.Show("Are you sure to delete IPMI module setting ?\nCurrent connection will be lost!", "Confirm clear setting !!", MessageBoxButtons.OKCancel);
+            if (confirmResult == DialogResult.OK)
+            {
+                if (serialController.connected)
+                    serialController.send("#$> clear");
+                serialController.disconnect();
+                Console.WriteLine("Disconnected!");
+                statusLabel.Text = "Idle";
+                enableConfigControl(false);
+            }
         }
 
         private void configBtn_Click(object sender, EventArgs e)
         {
-            serialController.send("#$> config");
+            var confirmResult = MessageBox.Show("Are you sure to reboot IPMI to config mode ?\nCurrent connection will be lost!", "Confirm reboot to Config mode!!", MessageBoxButtons.OKCancel);
+            if (confirmResult == DialogResult.OK)
+            {
+                if (serialController.connected)
+                    serialController.send("#$> config");
+                serialController.disconnect();
+                Console.WriteLine("Disconnected!");
+                statusLabel.Text = "Idle";
+                enableConfigControl(false);
+            }
+        }
+
+        private void gitLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/ChipTechno/IPMI-card");
         }
     }
 }

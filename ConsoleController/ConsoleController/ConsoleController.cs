@@ -14,61 +14,55 @@ namespace ConsoleController
     class ConsoleController
     {
 
+        //
+        public PowerShell PowerShellInstance;
+
         public ConsoleController()
         {
-
+            PowerShellInstance = PowerShell.Create();
         }
 
         public StringCollection excuteCommand(string command)
         {
-            using (PowerShell PowerShellInstance = PowerShell.Create())
+            PowerShellInstance.Commands.Clear();
+            PowerShellInstance.AddScript(command);
+     
+            // prepare a new collection to store output stream objects
+            PSDataCollection<PSObject> outputCollection = new PSDataCollection<PSObject>();
+
+            // use this overload to specify an output stream buffer
+            IAsyncResult result = PowerShellInstance.BeginInvoke<PSObject, PSObject>(null, outputCollection);
+
+            // do something else until execution has completed.
+            // this could be sleep/wait, or perhaps some other work
+            while (result.IsCompleted == false)
             {
-                PowerShellInstance.AddScript(command);
-
-                // prepare a new collection to store output stream objects
-                PSDataCollection<PSObject> outputCollection = new PSDataCollection<PSObject>();
-
-                // use this overload to specify an output stream buffer
-                IAsyncResult result = PowerShellInstance.BeginInvoke<PSObject, PSObject>(null, outputCollection);
-
-                // do something else until execution has completed.
-                // this could be sleep/wait, or perhaps some other work
-                while (result.IsCompleted == false)
-                {
                     Console.WriteLine("Waiting for pipeline to finish...");
                     Thread.Sleep(1000);
-
-                    // might want to place a timeout here...
-                }
-
-                Console.WriteLine("Execution has stopped. The pipeline state: " + PowerShellInstance.InvocationStateInfo.State);
-
-
-                StringCollection resultCollection = new StringCollection();
-
-                if(outputCollection.Count >0 )
-                {
-                    foreach (PSObject outputItem in outputCollection)
-                    {
-                        //TODO: handle/process the output items if required
-                        Console.WriteLine(outputItem.BaseObject.ToString());
-                        resultCollection.Add(outputItem.BaseObject.ToString());
-                    }
-                }
-                
-                if (PowerShellInstance.Streams.Error.Count > 0)
-                {
-                    resultCollection.Add("Error");
-                    foreach (ErrorRecord error in PowerShellInstance.Streams.Error)
-                    {
-                        Console.WriteLine(error.ToString());
-                        resultCollection.Add(error.ToString());
-                    }
-                }
-                return resultCollection;
             }
-        }
+            Console.WriteLine("Execution has stopped. The pipeline state: " + PowerShellInstance.InvocationStateInfo.State);
 
-        
+            StringCollection resultCollection = new StringCollection();
+            if(outputCollection.Count >0 )
+            {
+                foreach (PSObject outputItem in outputCollection)
+                {
+                    //TODO: handle/process the output items if required
+                    Console.WriteLine(outputItem.BaseObject.ToString());
+                    resultCollection.Add(outputItem.BaseObject.ToString());
+                }
+            }
+                
+            if (PowerShellInstance.Streams.Error.Count > 0)
+            {
+                resultCollection.Add("Error");
+                foreach (ErrorRecord error in PowerShellInstance.Streams.Error)
+                {
+                    Console.WriteLine(error.ToString());
+                    resultCollection.Add(error.ToString());
+                }
+            }
+            return resultCollection;
+        }   
     }
 }

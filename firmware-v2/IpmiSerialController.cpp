@@ -71,6 +71,14 @@ bool IpmiSerialController::executeCommand()
         return true;
     }
 
+    if (strncmp(serialBuffer.c_str(), "#$> status", 9) == 0)
+    {
+        mqttClient->publish(ipmiReportTopic.c_str(), "Generic IPMI : Online");
+        serialBuffer = "";
+        //Serial.println("#$< Generic IPMI : Online");
+        return true;
+    }
+
     //if not , this must be result of shell command , send it to shellReportTopic
     shellCommandReport();
     return true;
