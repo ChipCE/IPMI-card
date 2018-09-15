@@ -66,7 +66,7 @@ void setup()
     mqttClient.setCallback(callback);
 
     //get mqtt topic
-    _hardwareCotrolTopic = String(conf.mqttSub) + "/HardwareCotrol";
+    _hardwareCotrolTopic = String(conf.mqttSub) + "/HardwareControl";
     _hardwareReportTopic = String(conf.mqttPub) + "/HardwareReport";
     _shellCommandTopic = String(conf.mqttSub) + "/ShellCommand";
     _shellReportTopic = String(conf.mqttPub) + "/ShellReport";
@@ -151,9 +151,9 @@ void mqttReconnect()
         delay(5000);
       }
     }
+    //re-update power status
+    updatePowerState(true);
   }
-  //re-update power status
-  updatePowerState(true);
 }
 
 void callback(char *topic, byte *payload, unsigned int length)
@@ -197,6 +197,7 @@ bool handleHardwareCommand(char* cmd)
   if (strcmp(cmd, "status") == 0)
   {
     //report device status here
+    updatePowerState(true);
     return true;
   }
 
@@ -210,6 +211,7 @@ bool handleHardwareCommand(char* cmd)
     return true;
   }
 
+  /*
   if (strcmp(cmd, "reboot") == 0)
   {
     mqttClient.publish(_hardwareReportTopic.c_str(), "Execute IPMI reboot command...");
@@ -219,7 +221,9 @@ bool handleHardwareCommand(char* cmd)
       mqttClient.publish(_hardwareReportTopic.c_str(), "Reboot failed!");
     return true;
   }
+  */
 
+  /*
   if (strcmp(cmd, "force-shutdown") == 0)
   {
     mqttClient.publish(_hardwareReportTopic.c_str(), "Execute IPMI force-shutdown command...");
@@ -229,7 +233,8 @@ bool handleHardwareCommand(char* cmd)
       mqttClient.publish(_hardwareReportTopic.c_str(), "Force-shutdown failed!");
     return true;
   }
-
+  */
+ 
   if (strcmp(cmd, "power-on") == 0)
   {
     mqttClient.publish(_hardwareReportTopic.c_str(), "Execute IPMI power-on command...");

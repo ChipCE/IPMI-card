@@ -46,18 +46,12 @@ bool HardwareController::reboot()
 bool HardwareController::shutdown()
 {
     if(!getPowerState())
-        return true;
+        return false;
     //push button and release
-    unsigned long endTime = millis() + BUTTON_CLICK_INTERVAL;
     digitalWrite(RELAY,HIGH);
-    while(millis()<endTime)
-        yield();
+    nonBlockDelay(BUTTON_CLICK_INTERVAL);
     digitalWrite(RELAY,LOW);
-    //wait for system to shutdown
-    endTime = millis() + SHUTDOWN_TIMEOUT*1000;
-    while(millis()<endTime && getPowerState())
-        yield();
-    return !getPowerState();
+    return true;
 }
 
 
@@ -77,18 +71,12 @@ bool HardwareController::forceShutdown()
 bool HardwareController::powerOn()
 {
     if(getPowerState())
-        return true;
+        return false;
     //push button and release
-    unsigned long endTime = millis() + BUTTON_CLICK_INTERVAL;
     digitalWrite(RELAY,HIGH);
-    while(millis()<endTime)
-        yield();
+    nonBlockDelay(BUTTON_CLICK_INTERVAL);
     digitalWrite(RELAY,LOW);
-    //wait for system to startup
-    endTime = millis() + POWER_ON_TIMEOUT*1000;
-    while(millis()<endTime && !getPowerState())
-        yield();
-    return getPowerState();
+    return true;
 }
 
 
