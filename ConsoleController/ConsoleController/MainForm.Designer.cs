@@ -42,6 +42,11 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.debugTextBox = new System.Windows.Forms.TextBox();
             this.aboutTab = new System.Windows.Forms.TabPage();
+            this.shellLabel = new System.Windows.Forms.Label();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.buildLabel = new System.Windows.Forms.Label();
+            this.versionLabel = new System.Windows.Forms.Label();
+            this.appNameLabel = new System.Windows.Forms.Label();
             this.gitLink = new System.Windows.Forms.LinkLabel();
             this.appConfTab = new System.Windows.Forms.TabPage();
             this.appConfGroupBox = new System.Windows.Forms.GroupBox();
@@ -65,11 +70,6 @@
             this.comPortComboBox = new System.Windows.Forms.ComboBox();
             this.comPortLabel = new System.Windows.Forms.Label();
             this.tabControl = new System.Windows.Forms.TabControl();
-            this.appNameLabel = new System.Windows.Forms.Label();
-            this.versionLabel = new System.Windows.Forms.Label();
-            this.buildLabel = new System.Windows.Forms.Label();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.shellLabel = new System.Windows.Forms.Label();
             this.statusStrip.SuspendLayout();
             this.trayMenu.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -195,6 +195,53 @@
             this.aboutTab.TabIndex = 2;
             this.aboutTab.Text = "About";
             this.aboutTab.UseVisualStyleBackColor = true;
+            // 
+            // shellLabel
+            // 
+            this.shellLabel.AutoSize = true;
+            this.shellLabel.Location = new System.Drawing.Point(4, 75);
+            this.shellLabel.Name = "shellLabel";
+            this.shellLabel.Size = new System.Drawing.Size(136, 13);
+            this.shellLabel.TabIndex = 6;
+            this.shellLabel.Text = "Shell : Windows powershell";
+            // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Enabled = false;
+            this.richTextBox1.Location = new System.Drawing.Point(4, 113);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(562, 137);
+            this.richTextBox1.TabIndex = 5;
+            this.richTextBox1.Text = "Generic IPMI Console Controller\n\nChange log : v1.0 beta\nKnown bugs\n   - none :3\nT" +
+    "o-do\n   - none";
+            // 
+            // buildLabel
+            // 
+            this.buildLabel.AutoSize = true;
+            this.buildLabel.Location = new System.Drawing.Point(4, 55);
+            this.buildLabel.Name = "buildLabel";
+            this.buildLabel.Size = new System.Drawing.Size(93, 13);
+            this.buildLabel.TabIndex = 4;
+            this.buildLabel.Text = "Build : 201809116";
+            // 
+            // versionLabel
+            // 
+            this.versionLabel.AutoSize = true;
+            this.versionLabel.Location = new System.Drawing.Point(4, 35);
+            this.versionLabel.Name = "versionLabel";
+            this.versionLabel.Size = new System.Drawing.Size(90, 13);
+            this.versionLabel.TabIndex = 3;
+            this.versionLabel.Text = "Version : 1.1 beta";
+            // 
+            // appNameLabel
+            // 
+            this.appNameLabel.AutoSize = true;
+            this.appNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.appNameLabel.Location = new System.Drawing.Point(3, 10);
+            this.appNameLabel.Name = "appNameLabel";
+            this.appNameLabel.Size = new System.Drawing.Size(236, 20);
+            this.appNameLabel.TabIndex = 2;
+            this.appNameLabel.Text = "Generic IPMI Console Controller";
             // 
             // gitLink
             // 
@@ -460,53 +507,6 @@
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new System.Drawing.Size(577, 279);
             this.tabControl.TabIndex = 9;
-            // 
-            // appNameLabel
-            // 
-            this.appNameLabel.AutoSize = true;
-            this.appNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.appNameLabel.Location = new System.Drawing.Point(3, 10);
-            this.appNameLabel.Name = "appNameLabel";
-            this.appNameLabel.Size = new System.Drawing.Size(236, 20);
-            this.appNameLabel.TabIndex = 2;
-            this.appNameLabel.Text = "Generic IPMI Console Controller";
-            // 
-            // versionLabel
-            // 
-            this.versionLabel.AutoSize = true;
-            this.versionLabel.Location = new System.Drawing.Point(4, 35);
-            this.versionLabel.Name = "versionLabel";
-            this.versionLabel.Size = new System.Drawing.Size(90, 13);
-            this.versionLabel.TabIndex = 3;
-            this.versionLabel.Text = "Version : 1.1 beta";
-            // 
-            // buildLabel
-            // 
-            this.buildLabel.AutoSize = true;
-            this.buildLabel.Location = new System.Drawing.Point(4, 55);
-            this.buildLabel.Name = "buildLabel";
-            this.buildLabel.Size = new System.Drawing.Size(87, 13);
-            this.buildLabel.TabIndex = 4;
-            this.buildLabel.Text = "Build : 20180913";
-            // 
-            // richTextBox1
-            // 
-            this.richTextBox1.Enabled = false;
-            this.richTextBox1.Location = new System.Drawing.Point(4, 113);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(562, 137);
-            this.richTextBox1.TabIndex = 5;
-            this.richTextBox1.Text = "Generic IPMI Console Controller\n\nChange log : v1.0 beta\nKnown bugs\n   - none :3\nT" +
-    "o-do\n   - Remove Debug mode in stable release.";
-            // 
-            // shellLabel
-            // 
-            this.shellLabel.AutoSize = true;
-            this.shellLabel.Location = new System.Drawing.Point(4, 75);
-            this.shellLabel.Name = "shellLabel";
-            this.shellLabel.Size = new System.Drawing.Size(136, 13);
-            this.shellLabel.TabIndex = 6;
-            this.shellLabel.Text = "Shell : Windows powershell";
             // 
             // mainForm
             // 

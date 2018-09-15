@@ -19,12 +19,26 @@ namespace ConsoleController
 
         public ConsoleController()
         {
+            //PowerShellInstance = PowerShell.Create();
+        }
+
+        public void init()
+        {
             PowerShellInstance = PowerShell.Create();
+        }
+
+        public void destroy()
+        {
+            PowerShellInstance.Dispose();
         }
 
         public StringCollection excuteCommand(string command)
         {
+            //clear old data
             PowerShellInstance.Commands.Clear();
+            PowerShellInstance.Streams.Error.Clear();
+
+            //append new command
             PowerShellInstance.AddScript(command);
      
             // prepare a new collection to store output stream objects

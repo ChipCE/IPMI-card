@@ -22,6 +22,7 @@ namespace ConsoleController
         private System.Windows.Forms.TextBox textbox;
         private System.Windows.Forms.TextBox debugTextbox;
         private System.Windows.Forms.NotifyIcon notifyIcon;
+        private bool DEBUG;
         ConsoleController console;
 
 
@@ -34,7 +35,27 @@ namespace ConsoleController
             debugTextbox = debugTextBoxControl;
             notifyIcon = notifyIconControl;
             connected = false;
+            DEBUG = false;
             console = new ConsoleController();
+
+            //arg
+            string[] args = Environment.GetCommandLineArgs();
+            appendDebugTextbox("Args count : " + args.Count() + "\n");
+            foreach (string arg in args)
+            {
+                appendDebugTextbox(arg + "\n");
+            }
+            if (args.Count() > 1 && args[1] == "-d")
+            {
+                DEBUG = true;
+                appendDebugTextbox("Debug : true\n");
+            }
+            else
+            {
+                DEBUG = false;
+                appendDebugTextbox("Debug : false\n");
+            }
+               
         }
 
         public bool connect()
@@ -44,18 +65,20 @@ namespace ConsoleController
                 serial.Open();
                 serial.DataReceived += new SerialDataReceivedEventHandler(processData);
                 connected = true;
+                console.init();
             }
             catch (Exception exp)
             {
                 Console.WriteLine(exp.ToString());
                 return false;
             }
+            //console.init();
             return true;
         }
 
         bool isCommandType(String msg)
         {
-            if ((msg[0] == '#' && (msg[1] == '<' || msg[1] == '>' || msg[1] == '_' || msg[1] == '$') && (msg[2] == '<' || msg[2] == '>' || msg[2] == '_')) || (msg=="\n") || (msg=="\r"))
+            if ((msg[0] == '#' && (msg[1] == '<' || msg[1] == '>' || msg[1] == '_' || msg[1] == '$') && (msg[2] == '<' || msg[2] == '>' || msg[2] == '_')) || (msg=="\n") || (msg=="\r") && DEBUG)
                 return false;
             return true;
         }
@@ -123,6 +146,7 @@ namespace ConsoleController
             if(serial!=null)
                 serial.Close();
             connected = false;
+            console.destroy();
         }
 
         public void updateConfig(Config tmpConf)
