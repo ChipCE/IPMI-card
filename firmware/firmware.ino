@@ -1,445 +1,273 @@
-#include <FS.h>                  
 #include <ESP8266WiFi.h>
-#include <DNSServer.h>
-#include <ESP8266WebServer.h>
-#include <WiFiManagerMod.h>
-#include <ArduinoJson.h>
 #include <PubSubClient.h>
+#include <WiFiMan.h>
+#include "HardwareController.h"
+#include "IpmiSerialController.h"
 
+#define CONF_PIN 14
+#define DEBUG 1
+#define BUFFER_LENGTH 256
 
-//reset pin , for reset setting .pull up
-#define RESETPIN 14
-//use to switch pc power button 
-#define RELAYPIN 13
-//to monitor pc state (from usb)/reverse
-#define SENSEPIN 12
-
-//delay between delay on/off (miliseconds)
-#define RELAY_DELAY 100
-//delay between power-state change (milisecond)
-#define POWER_ON_WAIT 5000
-//delay time to shutdown (milisecond)
-#define SHUTDOWN_WAIT 60000
-//delay time to force shutdown (milisecond)
-#define FORCE_SHUTDOWN_WAIT 10000
-
-
-//flag for saving data
-bool shouldSaveConfig = false;
-
-//default values
-char mqtt_server[64] = "mqttserver.com";
-char mqtt_port[8] = "1883";
-char mqtt_user[16] = "user";
-char mqtt_pass[16] = "password";
-char mqtt_sub_topic[64] = "sub-topic";
-char mqtt_pub_topic[64] = "pub-topic";
-char mqtt_id[32] = "IPMI-ESP8266-based";
-
-//version
-char version[32] = "Ver 1.02b";
-
-
+//Controller
+Config conf;
+HardwareController hwController;
+IpmiSerialController ipmiSerialController;
 WiFiClient espClient;
-PubSubClient client(espClient);
+PubSubClient mqttClient;
 
-//callback notifying us of the need to save config
-void saveConfigCallback () 
+//Global var
+bool powerState;
+
+//--------------MQTT Topic-----------------------------------------
+String _hardwareCotrolTopic;
+String _hardwareReportTopic;
+String _shellCommandTopic;
+String _shellReportTopic;
+String _ipmiControlTopic;
+String _ipmiReportTopic;
+String _powerStateReport;
+String _connectionStatus;
+
+//---------------FUNCTION--------------------------------------------
+void callback(char *topic, byte *payload, unsigned int length);
+void reconnect();
+bool handleHardwareCommand(char* cmd);
+bool handleShellCommand(char* cmd);
+bool handleIpmiCommand(char* cmd);
+void updatePowerState(bool forceUpdate);
+
+//---------------MAIN PROG-------------------------------------------
+void setup()
 {
-  Serial.println("# Set shouldSaveConfig = true");
-  shouldSaveConfig = true;
-}
+  if(DEBUG)
+    Serial.begin(115200);
 
+  //pin mode ---
+  pinMode(CONF_PIN, INPUT_PULLUP);
 
+  //create default object
+  WiFiMan wman = WiFiMan();
+  wman.setDebug(true);
+  wman.setApName("IPMI-ConfigPortal");
+  wman.setWebUi("Config portal","Generic IPMI","Build : 20180916 1.0b","Branch : Master","ChipCE");
+  wman. setHelpInfo("For more information , please visit</br><a href=\"https://github.com/ChipTechno/IPMI-card\">https://github.com/ChipTechno/IPMI-card</a>");
+  hwController = HardwareController();
 
-void callback(char* topic, byte* payload, unsigned int length) 
-{
-  // Conver the incoming byte array to a string
-  payload[length] = '\0'; // Null terminator used to terminate the char array
-  String message = (char*)payload;
-  unsigned long start;
+  //get current power state
+  powerState = hwController.getPowerState();
 
-  Serial.print("Message arrived on topic: [");
-  Serial.print(topic);
-  Serial.print("], ");
-  Serial.println(message);
+  //set status led ON and Start Wifi manager
+  hwController.switchLed(true);
+  wman.start();
 
-  if(message == "help")
+  if (wman.getConfig(&conf))
   {
-    client.publish(mqtt_pub_topic,"--- Commands list ---");
-    client.publish(mqtt_pub_topic,"help : Display command list.");
-    client.publish(mqtt_pub_topic,"system-report : Display full system information.");
-    client.publish(mqtt_pub_topic,"power-on : Turn on the PC.");
-    client.publish(mqtt_pub_topic,"power-off : Turn off the PC.");
-    client.publish(mqtt_pub_topic,"force-power-off : Force power off the PC.");
-    client.publish(mqtt_pub_topic,"restart : Restart the PC");
+    //Connected :3
+    //set MQTT Server hand callback
+    mqttClient = PubSubClient(espClient);
+    mqttClient.setServer(conf.mqttAddr, conf.mqttPort);
+    mqttClient.setCallback(callback);
+
+    //get mqtt topic
+    _hardwareCotrolTopic = String(conf.mqttSub) + "/HardwareControl";
+    _hardwareReportTopic = String(conf.mqttPub) + "/HardwareReport";
+    _shellCommandTopic = String(conf.mqttSub) + "/ShellCommand";
+    _shellReportTopic = String(conf.mqttPub) + "/ShellReport";
+    _ipmiControlTopic = String(conf.mqttSub) + "/IpmiControl";
+    _ipmiReportTopic = String(conf.mqttPub) + "/IpmiReport";
+    _powerStateReport = String(conf.mqttPub) + "/PowerStateReport";
+    _connectionStatus = String(conf.mqttPub) + "/ConnectionStatus";
+
+    //enable serial controller
+    delay(100);
+    ipmiSerialController = IpmiSerialController(_shellReportTopic,_ipmiReportTopic,&mqttClient);
+
+    if(DEBUG)
+      Serial.println("Connected!!!");
   }
-
-  if(message == "system-report")
+  else
   {
-    client.publish(mqtt_pub_topic, "--- System report ---");
-    client.publish(mqtt_pub_topic, version);
-    if(digitalRead(SENSEPIN)==LOW)
-      client.publish(mqtt_pub_topic, "PC power state : ON");
-    else
-      client.publish(mqtt_pub_topic, "PC power state : OFF");
-    client.publish(mqtt_pub_topic, "-- Report end ---");
-  }
-
-  if(message == "power-on")
-  {
-    //read current pc power state
-    if(digitalRead(SENSEPIN)==HIGH)
-    {
-      //power is off 
-      client.publish(mqtt_pub_topic, "Trying to send power on signal ! Please wait ...");
-      //then send the power on signal
-      digitalWrite(RELAYPIN,HIGH);
-      delay(RELAY_DELAY);
-      digitalWrite(RELAYPIN,LOW);
-      //wait for pc to power up
-      start = millis();
-      while ((millis()-start)<POWER_ON_WAIT && digitalRead(SENSEPIN)!=LOW);
-      //re-check power state
-      if(digitalRead(SENSEPIN)==LOW)
-        client.publish(mqtt_pub_topic, "Power-on successed!");
-      else
-        client.publish(mqtt_pub_topic, "Error : Power-on failed");
-    }
-    else
-    {
-      client.publish(mqtt_pub_topic, "Warning : PC is already on! Command will be skipped.");
-    }
-  }
-
-  if(message == "power-off")
-  {
-    //read current pc power state
-    if(digitalRead(SENSEPIN)==LOW)
-    {
-      //power is on 
-      client.publish(mqtt_pub_topic, "Trying to send shutdown signal ! Please wait ...");
-      //then send the power off signal
-      digitalWrite(RELAYPIN,HIGH);
-      delay(RELAY_DELAY);
-      digitalWrite(RELAYPIN,LOW);
-      //wait for pc to power down
-      start = millis();
-      while ((millis()-start)<SHUTDOWN_WAIT && digitalRead(SENSEPIN)!=HIGH);
-      //re-check power state
-      if(digitalRead(SENSEPIN)==HIGH)
-        client.publish(mqtt_pub_topic, "Shutdown successed!");
-      else
-        client.publish(mqtt_pub_topic, "Error : Timeout , cannot shutdown pc !");
-    }
-    else
-    {
-      client.publish(mqtt_pub_topic, "Warning : PC is already off! Command will be skipped.");
-    }
-  }
-
-  if(message == "force-power-off")
-  {
-    //read current pc power state
-    if(digitalRead(SENSEPIN)==LOW)
-    {
-      //power is on 
-      client.publish(mqtt_pub_topic, "Trying to send force shutdown signal ! Please wait ...");
-      //then hold the power button
-      digitalWrite(RELAYPIN,HIGH);
-      //wait for pc to power down
-      start = millis();
-      while ((millis()-start)<FORCE_SHUTDOWN_WAIT && digitalRead(SENSEPIN)!=HIGH);
-      //release the power button
-      digitalWrite(RELAYPIN,LOW);
-
-      //re-check power state
-      if(digitalRead(SENSEPIN)==HIGH)
-        client.publish(mqtt_pub_topic, "Force shutdown successed!");
-      else
-        client.publish(mqtt_pub_topic, "Error : Timeout , cannot force shutdown pc !");
-    }
-    else
-    {
-      client.publish(mqtt_pub_topic, "Warning : PC is already off! Command will be skipped.");
-    }
-  }
-
-  if(message == "restart")
-  {
-    //read current pc power state
-    if(digitalRead(SENSEPIN)==LOW)
-    {
-      //power is on 
-      client.publish(mqtt_pub_topic, "Trying to send restart signal ! Please wait ...");
-     
-      //step 1 : shutdown
-      client.publish(mqtt_pub_topic, "Trying to restart ! [1/2] Waitting for pc to shutdown...");
-       //then send the power off signal
-      digitalWrite(RELAYPIN,HIGH);
-      delay(RELAY_DELAY);
-      digitalWrite(RELAYPIN,LOW);
-      //wait for pc to power down
-      start = millis();
-      while ((millis()-start)<SHUTDOWN_WAIT && digitalRead(SENSEPIN)!=HIGH);
-      //re-check power state
-      if(digitalRead(SENSEPIN)==LOW)
-      {
-        client.publish(mqtt_pub_topic, "Error : Timeout , cannot shutdown pc !");
-        return;
-      }
-
-      //step 2 : turn-on
-      client.publish(mqtt_pub_topic, "Trying to restart ! [2/2] Waitting for pc to power-on...");
-      //then send the power on signal
-      digitalWrite(RELAYPIN,HIGH);
-      delay(RELAY_DELAY);
-      digitalWrite(RELAYPIN,LOW);
-      //wait for pc to power on
-      start = millis();
-      while ((millis()-start)<POWER_ON_WAIT && digitalRead(SENSEPIN)!=LOW);
-      //re-check power state
-      if(digitalRead(SENSEPIN)==LOW)
-        client.publish(mqtt_pub_topic, "Restart successed!");
-      else
-        client.publish(mqtt_pub_topic, "Error : Cannot restart pc !");
-    }
-    else
-    {
-      client.publish(mqtt_pub_topic, "Warning : PC is off! Restart command will be skipped.");
-    }
+    //Connect failed or config timeout ,turnoff led indicator, put the device to sleep mode
+    hwController.switchLed(false);
+    ESP.deepSleep(0);
   }
 }
 
-
-void setup() 
+void loop()
 {
-  // put your setup code here, to run once:
-
-  //set mode for reset pin (pull-up)
-  pinMode(RESETPIN,INPUT);
-  //set mode for sense pin (pull-up)
-  pinMode(SENSEPIN,INPUT);
-  //set mode for relay pin
-  pinMode(RELAYPIN,OUTPUT);
-  
-  Serial.begin(115200);
-  Serial.println();
-  Serial.println("Startingup....");
-
-  WiFiManager wifiManager;
-  
-  //reset ap and SPIFFS
-  if(digitalRead(RESETPIN)==LOW)
-  {
-    Serial.println("# Reset Ap setting ...");
-    wifiManager.resetSettings();
-    SPIFFS.format();
-  }
-
-  //parse version infor to portal
-  wifiManager.setVersion(version);
-
-  //read configuration from FS json
-  Serial.println("# Mounting FS...");
-
-  if (SPIFFS.begin()) 
-  {
-    Serial.println("# Mounted file system");
-    if (SPIFFS.exists("/config.json")) 
-    {
-      //file exists, reading and loading
-      Serial.println("# Reading config file");
-      File configFile = SPIFFS.open("/config.json", "r");
-      if (configFile) 
-      {
-        Serial.println("# Opened config file");
-        size_t size = configFile.size();
-        // Allocate a buffer to store contents of the file.
-        std::unique_ptr<char[]> buf(new char[size]);
-
-        configFile.readBytes(buf.get(), size);
-        DynamicJsonBuffer jsonBuffer;
-        JsonObject& json = jsonBuffer.parseObject(buf.get());
-        json.printTo(Serial);
-        if (json.success()) 
-        {
-          Serial.println("\n# parsed json");
-          strcpy(mqtt_server, json["mqtt_server"]);
-          strcpy(mqtt_port, json["mqtt_port"]);
-          strcpy(mqtt_user, json["mqtt_user"]);
-          strcpy(mqtt_pass, json["mqtt_pass"]);
-          strcpy(mqtt_sub_topic, json["mqtt_sub_topic"]);
-          strcpy(mqtt_pub_topic, json["mqtt_pub_topic"]);
-          strcpy(mqtt_id, json["mqtt_id"]);
-        } 
-        else 
-        {
-          Serial.println("# Failed to load json config");
-        }
-      }
-    }
-  } 
-  else 
-  {
-    Serial.println("# Failed to mount FS");
-  }
-  //end read
-
-
-
-  // The extra parameters
-  WiFiManagerParameter custom_mqtt_server("server", "mqtt server", "", 63);
-  WiFiManagerParameter custom_mqtt_port("port", "port", "1883", 7," type='number'");
-  WiFiManagerParameter custom_mqtt_user("user", "mqtt user", "", 15);
-  WiFiManagerParameter custom_mqtt_pass("pass", "mqtt pass", "", 15," type='password'");
-  WiFiManagerParameter custom_mqtt_sub_topic("sub", "subscribe topic", "", 63);
-  WiFiManagerParameter custom_mqtt_pub_topic("pub", "publish topic", "", 63);
-  WiFiManagerParameter custom_mqtt_id("id", "mqtt id", mqtt_id, 31);
-
-  //Custom text parameters
-  WiFiManagerParameter custom_text_mqtt("<h2>MQTT Setting</h2>");
-
-  //set config save notify callback
-  wifiManager.setSaveConfigCallback(saveConfigCallback);
-
-  //set static ip
-  //  wifiManager.setSTAStaticIPConfig(IPAddress(10,0,1,99), IPAddress(10,0,1,1), IPAddress(255,255,255,0));
-  
-  //add parameters to wifiManager
-  wifiManager.addParameter(&custom_text_mqtt);
-  wifiManager.addParameter(&custom_mqtt_server);
-  wifiManager.addParameter(&custom_mqtt_port);
-  wifiManager.addParameter(&custom_mqtt_user);
-  wifiManager.addParameter(&custom_mqtt_pass);
-  wifiManager.addParameter(&custom_mqtt_sub_topic);
-  wifiManager.addParameter(&custom_mqtt_pub_topic);
-  wifiManager.addParameter(&custom_mqtt_id);
-
-  //set minimum quality of signal so it ignores AP's under that quality , defaults to 8%
-  //wifiManager.setMinimumSignalQuality();
-  
-  //sets timeout until configuration portal gets turned off ,useful to make it all retry or go to sleep ,in seconds
-  //wifiManager.setTimeout(300);
-
-  //fetches ssid and pass and tries to connect
-  //if it does not connect it starts an access point with the specified name
-  //here  "AutoConnectAP"
-  //and goes into a blocking loop awaiting configuration
-  if (!wifiManager.autoConnect("ESP8266", "password")) 
-  {
-    Serial.println("# Failed to connect and hit timeout");
-    delay(3000);
-    //reset and try again, or maybe put it to deep sleep
-    ESP.reset();
-    delay(5000);
-  }
-
-  //if you get here you have connected to the WiFi
-  Serial.println("# Connected !");
-
-  //read updated parameters
-  strcpy(mqtt_server, custom_mqtt_server.getValue());
-  strcpy(mqtt_port, custom_mqtt_port.getValue());
-  strcpy(mqtt_user, custom_mqtt_user.getValue());
-  strcpy(mqtt_pass, custom_mqtt_pass.getValue());
-  strcpy(mqtt_sub_topic, custom_mqtt_sub_topic.getValue());
-  strcpy(mqtt_pub_topic, custom_mqtt_pub_topic.getValue());
-  strcpy(mqtt_id, custom_mqtt_id.getValue());
-
-  //display debug parameters
-  Serial.println("#DEBUG : Updated parameters");
-  Serial.print("\tMQTT Server :");
-  Serial.println(mqtt_server);
-  Serial.print("\tMQTT Port :");
-  Serial.println(mqtt_port);
-  Serial.print("\tMQTT User :");
-  Serial.println(mqtt_user);
-  Serial.print("\tMQTT Password :");
-  Serial.println(mqtt_pass);
-  Serial.print("\tMQTT Subscribe topic :");
-  Serial.println(mqtt_sub_topic);
-  Serial.print("\tMQTT Publish topic :");
-  Serial.println(mqtt_pub_topic);
-  Serial.print("\tMQTT Id :");
-  Serial.println(mqtt_id);
-
-  //save the custom parameters to FS
-  if (shouldSaveConfig) 
-  {
-    Serial.println("# Saving config...");
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& json = jsonBuffer.createObject();
-    json["mqtt_server"] = mqtt_server;
-    json["mqtt_port"] = mqtt_port;
-    json["mqtt_user"] = mqtt_user;
-    json["mqtt_pass"] = mqtt_pass;
-    json["mqtt_sub_topic"] = mqtt_sub_topic;
-    json["mqtt_pub_topic"] = mqtt_pub_topic;
-    json["mqtt_id"] = mqtt_id;
-
-    File configFile = SPIFFS.open("/config.json", "w");
-    if (!configFile) 
-    {
-      Serial.println("# Failed to open config file for writing");
-    }
-
-    json.printTo(Serial);
-    json.printTo(configFile);
-    configFile.close();
-    //end save
-    Serial.println("# Save successed!");
-  }
-
-  Serial.print("# Local ip : ");
-  Serial.println(WiFi.localIP());
-
-  client.setServer(mqtt_server, atoi( mqtt_port ));
-  client.setCallback(callback);
+  //check for Force-config-button
+  if (digitalRead(CONF_PIN) == LOW)
+    rebootToApMode();
+  //re-connect to mqtt server if needed
+  mqttReconnect();
+  //handle mqtt client
+  mqttClient.loop();
+  //handle serial
+  ipmiSerialController.handleSerial();
+  //handle hardware 
+  hwController.handleHardware();
+  //update power state if needed
+  updatePowerState(false);
 }
 
 
-void reconnect() 
+//-------------------------------------------
+void mqttReconnect()
 {
-  // Loop until we're reconnected
-  while (!client.connected()) 
+  //check connection status
+  while (!mqttClient.connected())
   {
-    Serial.println("# Attempting MQTT connection...");
+    hwController.switchLed(true);
+    if (DEBUG)
+      Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    // If you do not want to use a username and password, change next line to
-    // if (client.connect("ESP8266Client")) {
-    if (client.connect(mqtt_id, mqtt_user, mqtt_pass)) 
+    bool connectResult;
+    if(strcmp(conf.mqttUsername,"")==0)
+      connectResult = mqttClient.connect(conf.mqttId,_connectionStatus.c_str(),2,true,"Offline");
+    else
+      connectResult = mqttClient.connect(conf.mqttId,conf.mqttUsername,conf.mqttPasswd,_connectionStatus.c_str(),2,true,"Offline");
+    if (connectResult)
     {
-      Serial.println("# Connected to MQTT server");
-      //subscribe
-      client.subscribe(mqtt_sub_topic,1);
-    } 
-    else 
-    {
-      Serial.print("\tFailed, rc=");
-      Serial.print(client.state());
-      Serial.println("\tTry again in 5 seconds");
-      // Wait 5 seconds before retrying
-      delay(5000);
+      if (DEBUG)
+        Serial.println("connected to MQTT server");
+
+      //(re)subscribe
+      mqttClient.subscribe(_hardwareCotrolTopic.c_str());
+      mqttClient.subscribe(_shellCommandTopic.c_str());
+      mqttClient.subscribe(_ipmiControlTopic.c_str());
+
+      //send hello
+      mqttClient.publish(_connectionStatus.c_str(), "Online",true);
     }
+    else
+    {
+      if (DEBUG)
+      {
+        Serial.print("failed, rc=");
+        Serial.print(mqttClient.state());
+        Serial.println(" try again in 5 seconds");
+        // Wait 5 seconds before retrying
+        delay(5000);
+      }
+    }
+    //re-update power status
+    updatePowerState(true);
+  }
+}
+
+void callback(char *topic, byte *payload, unsigned int length)
+{
+  //create copy of playload
+  char msg[BUFFER_LENGTH];
+  if(length<BUFFER_LENGTH)
+  {
+    for(int i=0;i<length;i++)
+      msg[i] = (char)payload[i];
+    msg[length] = '\0';
+  }
+  else
+  {
+    for(int i=0;i<BUFFER_LENGTH-1;i++)
+      msg[i] = (char)payload[i];
+    msg[BUFFER_LENGTH-1] = '\0';
+  }
+
+  if(DEBUG)
+  {
+    Serial.print("Message arrived [");
+    Serial.print(topic);
+    Serial.print("] ");
+    Serial.println(msg);
+  }
+  
+  if(strcmp(topic,_hardwareCotrolTopic.c_str())==0)
+  {
+    handleHardwareCommand(msg);
+    return;
+  }
+  
+  if(strcmp(topic,_shellCommandTopic.c_str())==0)
+  {
+    handleShellCommand(msg);
+    return;
+  }
+
+  if(strcmp(topic,_ipmiControlTopic.c_str())==0)
+  {
+    handleIpmiCommand(msg);
+    return;
   }
 }
 
 
-
-void loop() 
+bool handleHardwareCommand(char* cmd)
 {
-  // put your main code here, to run repeatedly:
-
-
-  //MQTT connect
-  if (!client.connected()) 
+  if (strcmp(cmd, "status") == 0)
   {
-    reconnect();
+    //report device status here
+    updatePowerState(true);
+    return true;
   }
-  client.loop();
-  
-  //Serial.println("publish new value...");
-  //client.publish(mqtt_pub_topic,"test Value", true);
-  delay(5000);
+
+  if (strcmp(cmd, "shutdown") == 0)
+  {
+    mqttClient.publish(_hardwareReportTopic.c_str(), "Execute IPMI shutdown command...");
+    hwController.switchPower();
+    return true;
+  }
+
+  if (strcmp(cmd, "power-on") == 0)
+  {
+    mqttClient.publish(_hardwareReportTopic.c_str(), "Execute IPMI power-on command...");
+    hwController.switchPower();
+    return true;
+  }
+  return false;
+}
+
+bool handleShellCommand(char* cmd)
+{
+  mqttClient.publish(_shellReportTopic.c_str(), "Trying to execute command : ");
+  mqttClient.publish(_shellReportTopic.c_str(), cmd);
+  ipmiSerialController.executeShellCommand(cmd);
+  return true;
+}
+
+bool handleIpmiCommand(char* cmd)
+{
+  if(strcmp(cmd,"reboot")==0)
+  {
+    mqttClient.publish(_ipmiReportTopic.c_str(), "IPMI : Reboot...");
+    reboot();
+    return true;
+  }
+
+  if(strcmp(cmd,"clear")==0)
+  {
+    mqttClient.publish(_ipmiReportTopic.c_str(), "IPMI : Clear al setting and reboot...");
+    clear();
+    return true;
+  }
+
+  if(strcmp(cmd,"config")==0)
+  {
+    mqttClient.publish(_ipmiReportTopic.c_str(), "IPMI : Reboot to config mode...");
+    rebootToApMode();
+    return true;
+  }
+
+  return true;
+}
+
+void updatePowerState(bool forceUpdate)
+{
+  bool currentPowerState = hwController.getPowerState();
+  if( (powerState != currentPowerState) || forceUpdate )
+  {
+    powerState = currentPowerState;
+    if(powerState)
+      mqttClient.publish(_powerStateReport.c_str(), "1");
+    else
+      mqttClient.publish(_powerStateReport.c_str(), "0");
+  }
 }

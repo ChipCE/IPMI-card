@@ -1,5 +1,5 @@
 # IPMI ver 2.0 manual
-Generic IPMI card version 2.0 technical manual
+Generic IPMI card version 2.0 manual
 
 ## IPMI MQTT topic structure
 
@@ -17,8 +17,6 @@ IPMI-root/
 ### HardwareControl
     - status
     - shutdown
-    - reboot
-    - force-shutdown
     - power-on
 
 ### ShellCommand
