@@ -7,12 +7,11 @@ HardwareController::HardwareController()
     pinMode(RELAY,OUTPUT);
     pinMode(LED,OUTPUT);
 
-    //default relay state
+    //default hardware state
     digitalWrite(RELAY,LOW);
     digitalWrite(LED,LOW);
 
-    ledStatus = false;
-    
+    ledStatus = false;    
     hearbeatTimer = millis();
 }
 
@@ -30,48 +29,8 @@ bool HardwareController::getPowerState()
     return true;
 }
 
-bool HardwareController::reboot()
+bool HardwareController::switchPower()
 {
-    //if pc off, just turn it on
-    if(!getPowerState())
-        return powerOn();
-    //if pc is on , shutdown it and re-power-on
-    if(shutdown())
-        return powerOn();
-    else
-        return false;
-}
-
-
-bool HardwareController::shutdown()
-{
-    if(!getPowerState())
-        return false;
-    //push button and release
-    digitalWrite(RELAY,HIGH);
-    nonBlockDelay(BUTTON_CLICK_INTERVAL);
-    digitalWrite(RELAY,LOW);
-    return true;
-}
-
-
-bool HardwareController::forceShutdown()
-{
-    if(!getPowerState())
-        return true;
-    unsigned long endTime = millis() + FORCE_SHUTDOWN_TIMEOUT*1000;
-    digitalWrite(RELAY,HIGH);
-    while(millis()<endTime && getPowerState())
-        yield();
-    digitalWrite(RELAY,LOW);
-    return !getPowerState();
-}
-
-
-bool HardwareController::powerOn()
-{
-    if(getPowerState())
-        return false;
     //push button and release
     digitalWrite(RELAY,HIGH);
     nonBlockDelay(BUTTON_CLICK_INTERVAL);
@@ -96,4 +55,10 @@ void HardwareController::heartBeat()
         hearbeatTimer = millis();
         switchLed(!ledStatus);
     }
+}
+
+void HardwareController::handleHardware()
+{
+    //handle led heartbeat
+    heartBeat();
 }

@@ -48,6 +48,9 @@ void setup()
   //create default object
   WiFiMan wman = WiFiMan();
   wman.setDebug(true);
+  wman.setApName("IPMI-ConfigPortal");
+  wman.setWebUi("Config portal","Generic IPMI","version : 1.0b","Branch : Master","ChipCE");
+  wman. setHelpInfo("For more information , please visit</br><a href=\"https://github.com/ChipTechno/IPMI-card\">https://github.com/ChipTechno/IPMI-card</a>");
   hwController = HardwareController();
 
   //get current power state
@@ -104,8 +107,8 @@ void loop()
   mqttClient.loop();
   //handle serial
   ipmiSerialController.handleSerial();
-  //blink status led
-  hwController.heartBeat();
+  //handle hardware (led heartbeat , non-block delay)
+  hwController.handleHardware();
   //update power state
   updatePowerState(false);
 }
@@ -204,47 +207,16 @@ bool handleHardwareCommand(char* cmd)
   if (strcmp(cmd, "shutdown") == 0)
   {
     mqttClient.publish(_hardwareReportTopic.c_str(), "Execute IPMI shutdown command...");
-    if(hwController.shutdown())
-      mqttClient.publish(_hardwareReportTopic.c_str(), "Shutdown success!");
-    else
-      mqttClient.publish(_hardwareReportTopic.c_str(), "Shutdown failed!");
+    hwController.switchPower();
     return true;
   }
 
-  /*
-  if (strcmp(cmd, "reboot") == 0)
-  {
-    mqttClient.publish(_hardwareReportTopic.c_str(), "Execute IPMI reboot command...");
-    if(hwController.reboot())
-      mqttClient.publish(_hardwareReportTopic.c_str(), "Reboot success!");
-    else
-      mqttClient.publish(_hardwareReportTopic.c_str(), "Reboot failed!");
-    return true;
-  }
-  */
-
-  /*
-  if (strcmp(cmd, "force-shutdown") == 0)
-  {
-    mqttClient.publish(_hardwareReportTopic.c_str(), "Execute IPMI force-shutdown command...");
-    if(hwController.forceShutdown())
-      mqttClient.publish(_hardwareReportTopic.c_str(), "Force-shutdown success!");
-    else
-      mqttClient.publish(_hardwareReportTopic.c_str(), "Force-shutdown failed!");
-    return true;
-  }
-  */
- 
   if (strcmp(cmd, "power-on") == 0)
   {
     mqttClient.publish(_hardwareReportTopic.c_str(), "Execute IPMI power-on command...");
-    if(hwController.powerOn())
-      mqttClient.publish(_hardwareReportTopic.c_str(), "Power-on success!");
-    else
-      mqttClient.publish(_hardwareReportTopic.c_str(), "Power-on failed!");
+    hwController.switchPower();
     return true;
   }
-
   return false;
 }
 
