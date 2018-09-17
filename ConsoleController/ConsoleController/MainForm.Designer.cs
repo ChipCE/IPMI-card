@@ -43,7 +43,7 @@
             this.debugTextBox = new System.Windows.Forms.TextBox();
             this.aboutTab = new System.Windows.Forms.TabPage();
             this.shellLabel = new System.Windows.Forms.Label();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.changelogTextBox = new System.Windows.Forms.RichTextBox();
             this.buildLabel = new System.Windows.Forms.Label();
             this.versionLabel = new System.Windows.Forms.Label();
             this.appNameLabel = new System.Windows.Forms.Label();
@@ -70,6 +70,11 @@
             this.comPortComboBox = new System.Windows.Forms.ComboBox();
             this.comPortLabel = new System.Windows.Forms.Label();
             this.tabControl = new System.Windows.Forms.TabControl();
+            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemClearSysLog = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemClearDebugLog = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemClearAllLog = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip.SuspendLayout();
             this.trayMenu.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -84,7 +89,8 @@
             // statusStrip
             // 
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.statusLabel});
+            this.statusLabel,
+            this.toolStripDropDownButton1});
             this.statusStrip.Location = new System.Drawing.Point(0, 463);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(577, 22);
@@ -184,7 +190,7 @@
             // aboutTab
             // 
             this.aboutTab.Controls.Add(this.shellLabel);
-            this.aboutTab.Controls.Add(this.richTextBox1);
+            this.aboutTab.Controls.Add(this.changelogTextBox);
             this.aboutTab.Controls.Add(this.buildLabel);
             this.aboutTab.Controls.Add(this.versionLabel);
             this.aboutTab.Controls.Add(this.appNameLabel);
@@ -205,15 +211,16 @@
             this.shellLabel.TabIndex = 6;
             this.shellLabel.Text = "Shell : Windows powershell";
             // 
-            // richTextBox1
+            // changelogTextBox
             // 
-            this.richTextBox1.Enabled = false;
-            this.richTextBox1.Location = new System.Drawing.Point(4, 113);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(562, 137);
-            this.richTextBox1.TabIndex = 5;
-            this.richTextBox1.Text = "Generic IPMI Console Controller\n\nChange log : v1.0 beta\nKnown bugs\n   - none :3\nT" +
-    "o-do\n   - none";
+            this.changelogTextBox.Enabled = false;
+            this.changelogTextBox.Location = new System.Drawing.Point(4, 113);
+            this.changelogTextBox.Name = "changelogTextBox";
+            this.changelogTextBox.Size = new System.Drawing.Size(562, 137);
+            this.changelogTextBox.TabIndex = 5;
+            this.changelogTextBox.Text = "Generic IPMI Console Controller\n\nChange log : v1.0 beta\nKnown bugs\n   - Missing n" +
+    "ewline character  after minimized-maximized application (text arrange).\nTo-do\n  " +
+    " - none";
             // 
             // buildLabel
             // 
@@ -222,7 +229,7 @@
             this.buildLabel.Name = "buildLabel";
             this.buildLabel.Size = new System.Drawing.Size(93, 13);
             this.buildLabel.TabIndex = 4;
-            this.buildLabel.Text = "Build : 201809116";
+            this.buildLabel.Text = "Build : 201809117";
             // 
             // versionLabel
             // 
@@ -508,6 +515,48 @@
             this.tabControl.Size = new System.Drawing.Size(577, 279);
             this.tabControl.TabIndex = 9;
             // 
+            // toolStripDropDownButton1
+            // 
+            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.clearToolStripMenuItem});
+            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(29, 20);
+            this.toolStripDropDownButton1.Text = "toolStripDropDownButton1";
+            // 
+            // clearToolStripMenuItem
+            // 
+            this.clearToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemClearSysLog,
+            this.menuItemClearDebugLog,
+            this.menuItemClearAllLog});
+            this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.clearToolStripMenuItem.Text = "Clear";
+            // 
+            // menuItemClearSysLog
+            // 
+            this.menuItemClearSysLog.Name = "menuItemClearSysLog";
+            this.menuItemClearSysLog.Size = new System.Drawing.Size(191, 22);
+            this.menuItemClearSysLog.Text = "System log";
+            this.menuItemClearSysLog.Click += new System.EventHandler(this.menuItemClearSysLog_Click);
+            // 
+            // menuItemClearDebugLog
+            // 
+            this.menuItemClearDebugLog.Name = "menuItemClearDebugLog";
+            this.menuItemClearDebugLog.Size = new System.Drawing.Size(191, 22);
+            this.menuItemClearDebugLog.Text = "Debug log";
+            this.menuItemClearDebugLog.Click += new System.EventHandler(this.menuItemClearDebugLog_Click);
+            // 
+            // menuItemClearAllLog
+            // 
+            this.menuItemClearAllLog.Name = "menuItemClearAllLog";
+            this.menuItemClearAllLog.Size = new System.Drawing.Size(191, 22);
+            this.menuItemClearAllLog.Text = "Debug ans System log";
+            this.menuItemClearAllLog.Click += new System.EventHandler(this.allLogToolStripMenuItem_Click);
+            // 
             // mainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -582,7 +631,12 @@
         private System.Windows.Forms.Label buildLabel;
         private System.Windows.Forms.Label versionLabel;
         private System.Windows.Forms.Label shellLabel;
-        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.RichTextBox changelogTextBox;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
+        private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem menuItemClearSysLog;
+        private System.Windows.Forms.ToolStripMenuItem menuItemClearDebugLog;
+        private System.Windows.Forms.ToolStripMenuItem menuItemClearAllLog;
     }
 }
 

@@ -6,7 +6,7 @@ Generic IPMI card version 2.0 manual
 IPMI-root/
 - /HardwareCotrol
 - /HardwareReport
-- /ShellCommand
+- /ShellControl
 - /ShellReport
 - /IpmiControl
 - /IpmiReport

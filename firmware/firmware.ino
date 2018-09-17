@@ -4,8 +4,9 @@
 #include "HardwareController.h"
 #include "IpmiSerialController.h"
 
-#define CONF_PIN 14
 #define DEBUG 1
+
+#define CONF_PIN 14
 #define BUFFER_LENGTH 256
 
 //Controller
@@ -39,17 +40,21 @@ void updatePowerState(bool forceUpdate);
 //---------------MAIN PROG-------------------------------------------
 void setup()
 {
-  if(DEBUG)
-    Serial.begin(115200);
-
   //pin mode ---
   pinMode(CONF_PIN, INPUT_PULLUP);
 
-  //create default object
+  //create wifi controller
   WiFiMan wman = WiFiMan();
-  wman.setDebug(true);
+
+  if(DEBUG)
+  {
+    Serial.begin(115200);
+    wman.setDebug(true);
+  }
+  
+  //UI config
   wman.setApName("IPMI-ConfigPortal");
-  wman.setWebUi("Config portal","Generic IPMI","Build : 20180916 1.0b","Branch : Master","ChipCE");
+  wman.setWebUi("Config portal","Generic IPMI","Build : 20180917 1.0b","Branch : Master","ChipCE");
   wman. setHelpInfo("For more information , please visit</br><a href=\"https://github.com/ChipTechno/IPMI-card\">https://github.com/ChipTechno/IPMI-card</a>");
   hwController = HardwareController();
 
@@ -71,7 +76,7 @@ void setup()
     //get mqtt topic
     _hardwareCotrolTopic = String(conf.mqttSub) + "/HardwareControl";
     _hardwareReportTopic = String(conf.mqttPub) + "/HardwareReport";
-    _shellCommandTopic = String(conf.mqttSub) + "/ShellCommand";
+    _shellCommandTopic = String(conf.mqttSub) + "/ShellControl";
     _shellReportTopic = String(conf.mqttPub) + "/ShellReport";
     _ipmiControlTopic = String(conf.mqttSub) + "/IpmiControl";
     _ipmiReportTopic = String(conf.mqttPub) + "/IpmiReport";
@@ -83,7 +88,7 @@ void setup()
     ipmiSerialController = IpmiSerialController(_shellReportTopic,_ipmiReportTopic,&mqttClient);
 
     if(DEBUG)
-      Serial.println("Connected!!!");
+      Serial.println("#<> Connected!!!");
   }
   else
   {
@@ -119,7 +124,7 @@ void mqttReconnect()
   {
     hwController.switchLed(true);
     if (DEBUG)
-      Serial.print("Attempting MQTT connection...");
+      Serial.println("#<> Attempting MQTT connection...");
     // Attempt to connect
     bool connectResult;
     if(strcmp(conf.mqttUsername,"")==0)
@@ -129,7 +134,7 @@ void mqttReconnect()
     if (connectResult)
     {
       if (DEBUG)
-        Serial.println("connected to MQTT server");
+        Serial.println("#<> connected to MQTT server");
 
       //(re)subscribe
       mqttClient.subscribe(_hardwareCotrolTopic.c_str());
@@ -143,9 +148,9 @@ void mqttReconnect()
     {
       if (DEBUG)
       {
-        Serial.print("failed, rc=");
+        Serial.print("#<> failed, rc=");
         Serial.print(mqttClient.state());
-        Serial.println(" try again in 5 seconds");
+        Serial.println("try again in 5 seconds");
         // Wait 5 seconds before retrying
         delay(5000);
       }
@@ -174,7 +179,7 @@ void callback(char *topic, byte *payload, unsigned int length)
 
   if(DEBUG)
   {
-    Serial.print("Message arrived [");
+    Serial.print("#<> Message arrived [");
     Serial.print(topic);
     Serial.print("] ");
     Serial.println(msg);
@@ -227,8 +232,9 @@ bool handleHardwareCommand(char* cmd)
 
 bool handleShellCommand(char* cmd)
 {
-  mqttClient.publish(_shellReportTopic.c_str(), "Trying to execute command : ");
-  mqttClient.publish(_shellReportTopic.c_str(), cmd);
+  //String cmdStr(cmd);
+  //String msg = "Trying to execute command : " + String(cmd);
+  //mqttClient.publish(_shellReportTopic.c_str(),msg.c_str());
   ipmiSerialController.executeShellCommand(cmd);
   return true;
 }

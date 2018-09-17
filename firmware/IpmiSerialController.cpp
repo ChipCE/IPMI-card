@@ -37,7 +37,7 @@ void IpmiSerialController::handleSerial()
         // Process message when new line character is recieved
         if ((recievedChar == '\n') || (recievedChar == '\r'))
         {
-            serialBuffer += '\0';
+            serialBuffer[serialBuffer.length()-1] = '\0';
             executeCommand();
             //serialBuffer = "";
         }
@@ -95,5 +95,6 @@ void IpmiSerialController::shellCommandReport()
 
 void IpmiSerialController::executeShellCommand(char *cmd)
 {
+    delay(200);
     Serial.println(cmd);
 }

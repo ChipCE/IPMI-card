@@ -176,6 +176,7 @@ namespace ConsoleController
 
         private void mainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            /*
             //cancel the close event 
             e.Cancel = true;
             //hide window
@@ -184,6 +185,12 @@ namespace ConsoleController
             this.ShowInTaskbar = false;
             //show tooltip
             notifyIcon.ShowBalloonTip(1000, "Console controller", "Application minimized to system tray.", ToolTipIcon.Info);
+            */
+            if (serialController != null)
+            {
+                serialController.disconnect();
+            }
+            Application.Exit();
         }
 
         private void mainForm_Resize(object sender, EventArgs e)
@@ -476,6 +483,22 @@ namespace ConsoleController
         private void gitLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://github.com/ChipTechno/IPMI-card");
+        }
+        
+        private void allLogToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            logTextBox.Text = "";
+            debugTextBox.Text = "";
+        }
+
+        private void menuItemClearSysLog_Click(object sender, EventArgs e)
+        {
+            logTextBox.Text = "";
+        }
+
+        private void menuItemClearDebugLog_Click(object sender, EventArgs e)
+        {
+            debugTextBox.Text = "";
         }
     }
 }

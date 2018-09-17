@@ -78,8 +78,20 @@ namespace ConsoleController
 
         bool isCommandType(String msg)
         {
-            if ((msg[0] == '#' && (msg[1] == '<' || msg[1] == '>' || msg[1] == '_' || msg[1] == '$') && (msg[2] == '<' || msg[2] == '>' || msg[2] == '_')) || (msg=="\n") || (msg=="\r") && DEBUG)
+            if (
+                DEBUG
+                &&
+                msg[0] == '#'
+                &&
+                (msg[1] == '<' || msg[1] == '>' || msg[1] == '_')
+                &&
+                (msg[2] == '<' || msg[2] == '>' || msg[2] == '_')
+                )
+            {
+                Console.WriteLine("Debug command type");
                 return false;
+            }
+            Console.WriteLine("Shell command type");
             return true;
         }
 
@@ -109,7 +121,7 @@ namespace ConsoleController
                     if (config.enable && connected)
                     {
                         //console debug
-                        Console.WriteLine("##> " + msg);
+                        Console.WriteLine("ipmi:$ " + msg);
 
                         appendTextbox("Trying to execute command: " + msg + "\n");
                         //try to execute it
@@ -117,7 +129,8 @@ namespace ConsoleController
                         StringCollection resultCollection = console.excuteCommand(msg);
 
                         //display the output
-                        serial.WriteLine("\n##> " + msg);
+                        serial.WriteLine(" ");
+                        serial.WriteLine("ipmi:$ " + msg);
                         foreach (string result in resultCollection)
                         {
                             //append result to log textbox

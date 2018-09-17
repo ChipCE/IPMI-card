@@ -29,7 +29,8 @@ namespace ConsoleController
 
         public void destroy()
         {
-            PowerShellInstance.Dispose();
+            if(PowerShellInstance!=null)
+                PowerShellInstance.Dispose();
         }
 
         public StringCollection excuteCommand(string command)
@@ -69,7 +70,7 @@ namespace ConsoleController
                 
             if (PowerShellInstance.Streams.Error.Count > 0)
             {
-                resultCollection.Add("Error");
+                //resultCollection.Add("Error");
                 foreach (ErrorRecord error in PowerShellInstance.Streams.Error)
                 {
                     Console.WriteLine(error.ToString());
