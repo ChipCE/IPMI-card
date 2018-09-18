@@ -22,7 +22,7 @@ bool powerState;
 //--------------MQTT Topic-----------------------------------------
 String _hardwareCotrolTopic;
 String _hardwareReportTopic;
-String _shellCommandTopic;
+String _shellControlTopic;
 String _shellReportTopic;
 String _ipmiControlTopic;
 String _ipmiReportTopic;
@@ -53,7 +53,7 @@ void setup()
   }
   
   //UI config
-  wman.setApName("IPMI-ConfigPortal");
+  wman.setApName("IPMI-ConfigPortal-");
   wman.setWebUi("Config portal","Generic IPMI","Build : 20180917 1.0b","Branch : Master","ChipCE");
   wman. setHelpInfo("For more information , please visit</br><a href=\"https://github.com/ChipTechno/IPMI-card\">https://github.com/ChipTechno/IPMI-card</a>");
   hwController = HardwareController();
@@ -76,7 +76,7 @@ void setup()
     //get mqtt topic
     _hardwareCotrolTopic = String(conf.mqttSub) + "/HardwareControl";
     _hardwareReportTopic = String(conf.mqttPub) + "/HardwareReport";
-    _shellCommandTopic = String(conf.mqttSub) + "/ShellControl";
+    _shellControlTopic = String(conf.mqttSub) + "/ShellControl";
     _shellReportTopic = String(conf.mqttPub) + "/ShellReport";
     _ipmiControlTopic = String(conf.mqttSub) + "/IpmiControl";
     _ipmiReportTopic = String(conf.mqttPub) + "/IpmiReport";
@@ -138,7 +138,7 @@ void mqttReconnect()
 
       //(re)subscribe
       mqttClient.subscribe(_hardwareCotrolTopic.c_str());
-      mqttClient.subscribe(_shellCommandTopic.c_str());
+      mqttClient.subscribe(_shellControlTopic.c_str());
       mqttClient.subscribe(_ipmiControlTopic.c_str());
 
       //send hello
@@ -191,7 +191,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     return;
   }
   
-  if(strcmp(topic,_shellCommandTopic.c_str())==0)
+  if(strcmp(topic,_shellControlTopic.c_str())==0)
   {
     handleShellCommand(msg);
     return;
@@ -272,8 +272,8 @@ void updatePowerState(bool forceUpdate)
   {
     powerState = currentPowerState;
     if(powerState)
-      mqttClient.publish(_powerStateReport.c_str(), "1");
+      mqttClient.publish(_powerStateReport.c_str(), "1",true);
     else
-      mqttClient.publish(_powerStateReport.c_str(), "0");
+      mqttClient.publish(_powerStateReport.c_str(), "0",true);
   }
 }
