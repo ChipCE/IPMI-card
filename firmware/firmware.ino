@@ -128,9 +128,9 @@ void mqttReconnect()
     // Attempt to connect
     bool connectResult;
     if(strcmp(conf.mqttUsername,"")==0)
-      connectResult = mqttClient.connect(conf.mqttId,_connectionStatus.c_str(),2,true,"Offline");
+      connectResult = mqttClient.connect(conf.mqttId,_connectionStatus.c_str(),2,true,"0");
     else
-      connectResult = mqttClient.connect(conf.mqttId,conf.mqttUsername,conf.mqttPasswd,_connectionStatus.c_str(),2,true,"Offline");
+      connectResult = mqttClient.connect(conf.mqttId,conf.mqttUsername,conf.mqttPasswd,_connectionStatus.c_str(),2,true,"0");
     if (connectResult)
     {
       if (DEBUG)
@@ -142,7 +142,7 @@ void mqttReconnect()
       mqttClient.subscribe(_ipmiControlTopic.c_str());
 
       //send hello
-      mqttClient.publish(_connectionStatus.c_str(), "Online",true);
+      mqttClient.publish(_connectionStatus.c_str(), "1",true);
     }
     else
     {
