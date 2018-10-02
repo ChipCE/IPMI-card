@@ -31,7 +31,7 @@ String _connectionStatus;
 
 //---------------FUNCTION--------------------------------------------
 void callback(char *topic, byte *payload, unsigned int length);
-void reconnect();
+void mqttReconnect();
 bool handleHardwareCommand(char* cmd);
 bool handleShellCommand(char* cmd);
 bool handleIpmiCommand(char* cmd);
@@ -60,6 +60,10 @@ void setup()
 
   //get current power state
   powerState = hwController.getPowerState();
+
+  //set Force config 
+  if(digitalRead(CONF_PIN)==LOW)
+    wman.forceApMode();
 
   //set status led ON and Start Wifi manager
   hwController.switchLed(true);
@@ -158,6 +162,8 @@ void mqttReconnect()
     //re-update power status
     updatePowerState(true);
   }
+  if(digitalRead(CONF_PIN)==LOW)
+    rebootToApMode();
 }
 
 void callback(char *topic, byte *payload, unsigned int length)
