@@ -1,8 +1,9 @@
 # var
-version="1.0 alpha 1018-10-21"
+version="1.0 alpha"
 
 # function
 ipmi-help () {
+    # or just call "man ipmi" here :3
     echo "Generic IPMI std $version"
     echo -e "USAGE \n\t ipmi [help]"
     echo -e "\t      [version]"
@@ -14,12 +15,12 @@ ipmi-help () {
     echo "OPTIONS"
     echo -e "\t help \n\t\t Print a short help text and exit."
     echo -e "\t version \n\t\t Display application version."
-    echo -e "\t status \n\t\t Display system current status."
-    echo -e "\t shell \n\t\t Connect to system via ssh."
-    echo -e "\t power-on \n\t\t Power-on the system."
-    echo -e "\t power-off \n\t\t Power-off(shutdown) the system."
-    echo -e "\t reboot \n\t\t Reboot the system."
-    echo -e "\t -f \n\t\t Force power-off or reboot the system."
+    echo -e "\t status \n\t\t Display the host system's current status."
+    echo -e "\t shell \n\t\t Connect to the host system via ssh."
+    echo -e "\t power-on \n\t\t Power-on the host system."
+    echo -e "\t power-off \n\t\t Power-off(shutdown) the host system."
+    echo -e "\t reboot \n\t\t Reboot the host system."
+    echo -e "\t -f \n\t\t Force power-off or reboot the host system."
 }
 
 # display current version
@@ -31,8 +32,7 @@ ipmi-version () {
 # main program ------------------------------------------------------
 
 # check if the first arg is empty 
-if [[ -z "$1" ]]; then
-    echo -e "Error : Arguments must be supplied.\n"
+if [ -z "$1" ]; then
     ipmi-help
     exit 0
 fi

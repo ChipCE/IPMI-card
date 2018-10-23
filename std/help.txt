@@ -1,1 +1,0 @@
-usage : ipmi [help] [version] [status] [shell] [power-on] [power-off] [reboot] [force-shutdown] 

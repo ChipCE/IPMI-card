@@ -1,0 +1,58 @@
+.\" Manpage for ipmi.
+.\" Contact login721@gmail.com to correct errors or typos.
+.TH man 1 "2018-10-22" "1.0 alpha" "ipmi man page"
+.SH NAME
+ipmi \- Intelligent Platform Management Interface for generic motherboard.
+.SH SYNOPSIS
+ipmi [help]
+.br
+     [version]
+.br
+     [status]
+.br
+     [shell]
+.br
+     [power-on]
+.br
+     [power-off] [-f]
+.br
+     [reboot] [-f]
+.SH DESCRIPTION
+ipmi is shell command line to control IPMI module.
+.SH OPTIONS
+.TP
+\fBhelp\fP
+.br
+Print a short help text and exit.
+.TP
+\fBversion\fP
+.br
+Display application version.
+.TP
+\fBstatus\fP
+.br
+Display the host system's current status.
+.TP
+\fBshell\fP
+.br
+Connect to the host system via ssh.
+.TP
+\fBpower-on\fP
+.br
+Power-on the host system.
+.TP
+\fBpower-off\fP
+.br
+Power-off(shutdown) the host system.
+.TP
+\fBreboot\fP
+.br
+Reboot the host system.
+.TP
+\fB-f\fP
+.br
+Force power-off or reboot the host system.
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+ChipCE (login721@gmail.com) https://github.com/ChipTechno
