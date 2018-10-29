@@ -1,12 +1,29 @@
-import RPi.GPIO as gpio
-import time
+import sys
+print sys.argv[0]
+print len(sys.argv)
+print str(sys.argv)
 
-gpio.setmode(gpio.BCM)
-gpio.setup(18, gpio.OUT)
+wait = False
+force = False
 
-while True:
-    gpio.output(18, gpio.HIGH)
-    time.sleep(1)
-    gpio.output(18, gpio.LOW)
-    time.sleep(1)
+if (len(sys.argv) > 3):
+    print "Error : Too much arguments!"
+    sys.exit
 
+if (len(sys.argv) == 1):
+    print "normal script"
+    sys.exit
+
+if (len(sys.argv) == 2):
+    if (sys.argv[1] == "-w"):
+        wait = True
+    if (sys.argv[1] == "-f"):
+        force = True
+
+if (len(sys.argv) == 3):
+    if (sys.argv[1] == "-w" or sys.argv[2] == "-w"):
+        wait = True
+    if (sys.argv[1] == "-f" or sys.argv[2] == "-f"):
+        force = True
+
+print "wait : " , wait , "\nforce : ",force

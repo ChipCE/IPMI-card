@@ -9,18 +9,19 @@ ipmi-help () {
     echo -e "\t      [version]"
     echo -e "\t      [status]"
     echo -e "\t      [shell]"
-    echo -e "\t      [power-on]"
-    echo -e "\t      [power-off] [-f]"
-    echo -e "\t      [reboot] [-f]"
+    echo -e "\t      [start]"
+    echo -e "\t      [stop] [-f]"
+    echo -e "\t      [restart] [-f]"
     echo "OPTIONS"
     echo -e "\t help \n\t\t Print a short help text and exit."
     echo -e "\t version \n\t\t Display application version."
     echo -e "\t status \n\t\t Display the host system's current status."
     echo -e "\t shell \n\t\t Connect to the host system via ssh."
-    echo -e "\t power-on \n\t\t Power-on the host system."
-    echo -e "\t power-off \n\t\t Power-off(shutdown) the host system."
-    echo -e "\t reboot \n\t\t Reboot the host system."
-    echo -e "\t -f \n\t\t Force power-off or reboot the host system."
+    echo -e "\t start \n\t\t Start the host system."
+    echo -e "\t stop \n\t\t Stop(shutdown) the host system."
+    echo -e "\t restart \n\t\t restart the host system."
+    echo -e "\t -f \n\t\t Force stop or restart the host system."
+    echo -e "\t -w \n\t\t Execute command and wait for the host system state to change."
 }
 
 # display current version
@@ -37,26 +38,61 @@ if [ -z "$1" ]; then
     exit 0
 fi
 
+# arg check
+_wait=false
+_force=false
+
+# check 2nd arg
+if [ -n "$2" ]; then
+    if [ "$2" == "-f" ]; then
+        _force=true
+    else
+        if [ "$2" == "-w" ]; then
+            _wait=true
+        else
+            echo -e "Error : Unknown argument \"$2\" !"
+            exit 1
+        fi
+    fi
+fi
+
+# check 3th arg
+if [ -n "$3" ]; then
+    if [ "$3" == "-f" ]; then
+        _force=true
+    else
+        if [ "$3" == "-w" ]; then
+            _wait=true
+        else
+            echo -e "Error : Unknown argument \"$3\" !"
+            exit 1
+        fi
+    fi
+fi
+
+
 # open ssh connection
 if [ "$1" = "shell" ]; then
-    if [ -n "$2" ]; then
+    if [ $# -gt 1 ]; then
         echo "Error : Too much arguments!"
         exit 1
     fi
+
     # read config file
     host=`cat ipmi.conf`
     if [ "$host" = "" ]; then
-        echo "not configured"
+        echo "Cannot get host IP address!"
     else
-        echo "execute ssh $host"
-        ssh $host
+        printf "Username : "
+        read username
+        ssh $username@$host
     fi
     exit 0
 fi
 
 # handle status report
 if [ "$1" = "status" ]; then
-    if [ -n "$2" ]; then
+    if [ $# -gt 1 ]; then
         echo "Error : Too much arguments!"
         exit 1
     fi
@@ -65,106 +101,72 @@ if [ "$1" = "status" ]; then
     exit 0
 fi
 
-# handle power-on
-if [ "$1" = "power-on" ]; then
-    if [ -n "$2" ]; then
+
+# handle start
+if [ "$1" = "start" ]; then
+    if [ $# -gt 2 ]; then
         echo "Error : Too much arguments!"
         exit 1
     fi
-    # run power-on script
-    echo "power-on"
+
+    _command="python start.py"
+
+    if [ "$_wait" == true ]; then
+        _command="$_command -w"
+    fi
+
+    if [ "$_force" == true ]; then
+        echo "-f will be ignore!"
+    fi
+
+    echo $_command
+    $_command
     exit 0
 fi
 
-# handle power-off
-if [ "$1" = "power-off" ]; then
-    if [ -n "$3" ]; then
+# handle stop
+if [ "$1" = "stop" ]; then
+    if [ $# -gt 3 ]; then
         echo "Error : Too much arguments!"
         exit 1
     fi
-    
-    if [ -z "$2" ]; then
-        echo "power-off"
-        exit 0
+
+    _command="python stop.py"
+
+    if [ "$_wait" == true ]; then
+        _command="$_command -w"
     fi
 
-    if [ "$2" = "-f" ]; then
-        echo "force power-off"
-        exit 0
-    else
-        echo -e "Error : Unknown argument \"$2\" !"
-        exit 1
-    fi
-fi
-
-
-# handle reboot
-if [ "$1" = "reboot" ]; then
-    if [ -n "$3" ]; then
-        echo "Error : Too much arguments!"
-        exit 1
-    fi
-    
-    if [ -z "$2" ]; then
-        echo "reboot"
-        exit 0
+    if [ "$_force" == true ]; then
+        _command="$_command -f"
     fi
 
-    if [ "$2" = "-f" ]; then
-        echo "force reboot"
-        exit 0
-    else
-        echo -e "Error : Unknown argument \"$2\" !"
-        exit 1
-    fi
-fi
-
-# help
-if [ "$1" = "help" ]; then
-    if [ -n "$2" ]; then
-        echo "Error : Too much arguments!"
-        exit 1
-    fi
-    ipmi-help
+    echo $_command
+    $_command
     exit 0
 fi
 
-# version
-if [ "$1" = "version" ]; then
-    if [ -n "$2" ]; then
+# handle restart
+if [ "$1" = "restart" ]; then
+    if [ $# -gt 2 ]; then
         echo "Error : Too much arguments!"
         exit 1
     fi
-    ipmi-version
+
+    _command="python restart.py"
+
+    if [ "$_force" == true ]; then
+        _command="$_command -f"
+    fi
+
+    if [ "$_wait" == true ]; then
+        echo "-w will be ignore!"
+    fi
+
+    echo $_command
+    $_command
     exit 0
 fi
 
-# force
-if [ "$1" = "-f" ]; then
-    if [ -z "$2" ]; then
-        echo "Error : Too few arguments!"
-        exit 1
-    fi
-
-    if [ "$2" = "power-off" ]; then
-        echo "force shutdown"
-        exit 0
-    fi
-
-    if [ "$2" = "reboot" ]; then
-        echo "force reboot"
-        exit 0
-    fi
-
-    echo -e "Error : Unknown argument \"$2\" !"
-    exit 1
-fi
-
-# thes rest
-echo -e "Error : Unknown argument!"
+echo -e "Error : Unknown argument \"$1\" !"
 exit 1
-
-
-echo "EOF"
-exit 0
-

@@ -12,11 +12,11 @@ ipmi [help]
 .br
      [shell]
 .br
-     [power-on]
+     [start]
 .br
-     [power-off] [-f]
+     [stop] [-f]
 .br
-     [reboot] [-f]
+     [restart] [-f]
 .SH DESCRIPTION
 ipmi is shell command line to control IPMI module.
 .SH OPTIONS
@@ -37,21 +37,21 @@ Display the host system's current status.
 .br
 Connect to the host system via ssh.
 .TP
-\fBpower-on\fP
+\fBstart\fP
 .br
-Power-on the host system.
+Start the host system.
 .TP
-\fBpower-off\fP
+\fBstop\fP
 .br
-Power-off(shutdown) the host system.
+Stop(shutdown) the host system.
 .TP
-\fBreboot\fP
+\fBrestart\fP
 .br
-Reboot the host system.
+Restart the host system.
 .TP
 \fB-f\fP
 .br
-Force power-off or reboot the host system.
+Force stop or restart the host system.
 .SH BUGS
 No known bugs.
 .SH AUTHOR
