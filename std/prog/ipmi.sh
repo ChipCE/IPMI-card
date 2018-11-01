@@ -168,5 +168,16 @@ if [ "$1" = "restart" ]; then
     exit 0
 fi
 
+# handle status report
+if [ "$1" = "auto-config" ]; then
+    if [ $# -gt 1 ]; then
+        echo "Error : Too much arguments!"
+        exit 1
+    fi
+    # run scan command
+    python status.py
+    exit 0
+fi
+
 echo -e "Error : Unknown argument \"$1\" !"
 exit 1
