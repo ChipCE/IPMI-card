@@ -1,3 +1,4 @@
+#!/bin/bash
 # var
 version="1.0 alpha"
 
