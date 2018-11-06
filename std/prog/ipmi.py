@@ -1,4 +1,5 @@
 import sys
+import os
 import RPi.GPIO as gpio
 import time
 
@@ -64,7 +65,9 @@ def status():
     else:
         print("Power stste : OFF")
     # os ready
-    ip = os.system("cat ./ipmi.conf")
+    with open("ipmi.conf") as f:
+        lines = f.readlines()
+    ip = lines[0]
     response = os.system("ping -c 1 " + ip)
     if response == 0:
         print("OS state : Ready")
@@ -81,6 +84,13 @@ def powerState():
 
 def default():
     gpio.output(18, gpio.LOW)
+
+def pingCheck():
+    try:
+        output = subprocess.check_output("ping -c 1 " + ip, shell=True)
+    except Exception, e:
+        return False
+    return True
 
 # -----------------------------------------------------
 
