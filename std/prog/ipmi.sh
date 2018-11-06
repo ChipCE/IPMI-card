@@ -22,7 +22,6 @@ ipmi-help () {
     echo -e "\t stop \n\t\t Stop(shutdown) the host system."
     echo -e "\t restart \n\t\t restart the host system."
     echo -e "\t -f \n\t\t Force stop or restart the host system."
-    echo -e "\t -w \n\t\t Execute command and wait for the host system state to change."
 }
 
 # display current version
@@ -40,7 +39,6 @@ if [ -z "$1" ]; then
 fi
 
 # arg check
-_wait=false
 _force=false
 
 # check 2nd arg
@@ -48,26 +46,8 @@ if [ -n "$2" ]; then
     if [ "$2" == "-f" ]; then
         _force=true
     else
-        if [ "$2" == "-w" ]; then
-            _wait=true
-        else
-            echo -e "Error : Unknown argument \"$2\" !"
-            exit 1
-        fi
-    fi
-fi
-
-# check 3th arg
-if [ -n "$3" ]; then
-    if [ "$3" == "-f" ]; then
-        _force=true
-    else
-        if [ "$3" == "-w" ]; then
-            _wait=true
-        else
-            echo -e "Error : Unknown argument \"$3\" !"
-            exit 1
-        fi
+        echo -e "Error : Unknown argument \"$2\" !"
+        exit 1
     fi
 fi
 
@@ -105,45 +85,28 @@ fi
 
 # handle start
 if [ "$1" = "start" ]; then
-    if [ $# -gt 2 ]; then
+    if [ $# -gt 1 ]; then
         echo "Error : Too much arguments!"
         exit 1
     fi
-
-    _command="python start.py"
-
-    if [ "$_wait" == true ]; then
-        _command="$_command -w"
-    fi
-
-    if [ "$_force" == true ]; then
-        echo "-f will be ignore!"
-    fi
-
-    echo $_command
-    $_command
+    echo "Start : python upmi.py start"
     exit 0
 fi
 
 # handle stop
 if [ "$1" = "stop" ]; then
-    if [ $# -gt 3 ]; then
+    if [ $# -gt 2 ]; then
         echo "Error : Too much arguments!"
         exit 1
     fi
 
-    _command="python stop.py"
-
-    if [ "$_wait" == true ]; then
-        _command="$_command -w"
-    fi
+    _command="python ipmi.py stop"
 
     if [ "$_force" == true ]; then
         _command="$_command -f"
     fi
 
-    echo $_command
-    $_command
+    echo "Stop : $_command"
     exit 0
 fi
 
@@ -154,18 +117,13 @@ if [ "$1" = "restart" ]; then
         exit 1
     fi
 
-    _command="python restart.py"
+    _command="python ipmi.py restart"
 
     if [ "$_force" == true ]; then
         _command="$_command -f"
     fi
 
-    if [ "$_wait" == true ]; then
-        echo "-w will be ignore!"
-    fi
-
-    echo $_command
-    $_command
+    echo "Restart : $_command"
     exit 0
 fi
 
