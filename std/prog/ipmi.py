@@ -3,6 +3,8 @@ import os
 import RPi.GPIO as gpio
 import time
 
+gpio.setwarnings(False) 
+
 gpio.setmode(gpio.BCM)
 # power monitor (active low)
 gpio.setup(4, gpio.IN)
@@ -20,7 +22,7 @@ def stop(_force):
         print("System state is OFF.")
         return
     # if not , then turn it off
-    if _force == true:
+    if _force == True:
         print("Trying to force shutdown...")
         gpio.output(18, gpio.HIGH)
         while powerState():
@@ -52,6 +54,9 @@ def restart(_force):
     print("Trying to restart...")
     print("Step 1 of 2 : Stop...")
     stop(_force)
+    while powerState() == True:
+        pass
+    time.sleep(1)
     print("Step 2 of 2 : Start..")
     start()
     return
@@ -63,16 +68,7 @@ def status():
     if powerState():
         print("Power state : ON")
     else:
-        print("Power stste : OFF")
-    # os ready
-    with open("ipmi.conf") as f:
-        lines = f.readlines()
-    ip = lines[0]
-    response = os.system("ping -c 1 " + ip)
-    if response == 0:
-        print("OS state : Ready")
-    else:
-        print("OS state : Unknown")
+        print("Power state : OFF")
     return
 
 # get power-state
@@ -84,13 +80,6 @@ def powerState():
 
 def default():
     gpio.output(18, gpio.LOW)
-
-def pingCheck():
-    try:
-        output = subprocess.check_output("ping -c 1 " + ip, shell=True)
-    except Exception, e:
-        return False
-    return True
 
 # -----------------------------------------------------
 
@@ -126,6 +115,6 @@ if (sys.argv[1] == "status"):
     status()
     sys.exit
 
-print("Error : Unknow arguments")
+# print("Error : Unknow arguments")
 sys.exit
 

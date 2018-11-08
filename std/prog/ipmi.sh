@@ -60,7 +60,7 @@ if [ "$1" = "shell" ]; then
     fi
 
     # read config file
-    host=`cat ipmi.conf`
+    host=`cat ~/.ipmi/ipmi.conf`
     if [ "$host" = "" ]; then
         echo "Cannot get host IP address!"
     else
@@ -78,7 +78,7 @@ if [ "$1" = "status" ]; then
         exit 1
     fi
     # run status report script
-    python status.py
+    python ~/.ipmi/ipmi.py status
     exit 0
 fi
 
@@ -89,7 +89,8 @@ if [ "$1" = "start" ]; then
         echo "Error : Too much arguments!"
         exit 1
     fi
-    echo "Start : python upmi.py start"
+    echo "Start : python ipmi.py start"
+    python ~/.ipmi/ipmi.py start
     exit 0
 fi
 
@@ -100,13 +101,14 @@ if [ "$1" = "stop" ]; then
         exit 1
     fi
 
-    _command="python ipmi.py stop"
+    _command="python ~/.ipmi/ipmi.py stop"
 
     if [ "$_force" == true ]; then
         _command="$_command -f"
     fi
 
     echo "Stop : $_command"
+    $_command
     exit 0
 fi
 
@@ -117,26 +119,17 @@ if [ "$1" = "restart" ]; then
         exit 1
     fi
 
-    _command="python ipmi.py restart"
+    _command="python ~/.ipmi/ipmi.py restart"
 
     if [ "$_force" == true ]; then
         _command="$_command -f"
     fi
 
     echo "Restart : $_command"
+    $_command
     exit 0
 fi
 
-# handle status report
-if [ "$1" = "auto-config" ]; then
-    if [ $# -gt 1 ]; then
-        echo "Error : Too much arguments!"
-        exit 1
-    fi
-    # run scan command
-    python status.py
-    exit 0
-fi
 
 echo -e "Error : Unknown argument \"$1\" !"
 exit 1
