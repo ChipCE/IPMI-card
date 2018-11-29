@@ -13,6 +13,7 @@ ipmi-help () {
     echo -e "\t      [start]"
     echo -e "\t      [stop] [-f]"
     echo -e "\t      [restart] [-f]"
+    echo -e "\t      [setup]"
     echo "OPTIONS"
     echo -e "\t help \n\t\t Print a short help text and exit."
     echo -e "\t version \n\t\t Display application version."
@@ -22,6 +23,7 @@ ipmi-help () {
     echo -e "\t stop \n\t\t Stop(shutdown) the host system."
     echo -e "\t restart \n\t\t restart the host system."
     echo -e "\t -f \n\t\t Force stop or restart the host system."
+    echo -e "\t setup \n\t\t Setup IPMI."
 }
 
 # display current version
@@ -130,6 +132,25 @@ if [ "$1" = "restart" ]; then
     exit 0
 fi
 
+# handle setup
+if [ "$1" = "setup" ]; then
+    if [ $# -gt 1 ]; then
+        echo "Error : Too much arguments!"
+        exit 1
+    fi
+
+    # delete old config line
+    if [ -f "~/.ipmi/ipmi.conf" ]; then
+        echo "Delete old config file."
+        rm ~/.ipmi/ipmi.conf
+    fi
+
+    read -p "Enter ip address of the host PC : " hIP
+    echo "$hIP" >> ~/.ipmi/ipmi.conf
+    echo ""
+    echo "Done!"
+    exit 0
+fi
 
 echo -e "Error : Unknown argument \"$1\" !"
 exit 1
