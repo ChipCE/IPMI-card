@@ -1,3 +1,4 @@
 $( document ).ready(function() {
-    alert("ready");
+    //alert("ready");
+    $("#kernel").load("test.txt");
 });

@@ -26,11 +26,6 @@ ipmi-help () {
     echo -e "\t setup \n\t\t Setup IPMI."
 }
 
-# display current version
-ipmi-version () {
-    echo $version
-}
-
 
 # main program ------------------------------------------------------
 
@@ -149,6 +144,39 @@ if [ "$1" = "setup" ]; then
     echo "$hIP" >> ~/.ipmi/ipmi.conf
     echo ""
     echo "Done!"
+    exit 0
+fi
+
+# handle version
+if [ "$1" = "version" ]; then
+    if [ $# -gt 1 ]; then
+        echo "Error : Too much arguments!"
+        exit 1
+    fi
+
+    echo $version
+    exit 0
+fi
+
+# handle ping
+if [ "$1" = "ping" ]; then
+    if [ $# -gt 1 ]; then
+        echo "Error : Too much arguments!"
+        exit 1
+    fi
+    
+    host=`cat ~/.ipmi/ipmi.conf`
+    if [ "$host" = "" ]; then
+        echo "Cannot get host IP address!"
+    else
+        pingRes=($(ping -q -c1 $host > /dev/null))
+        if [ $? -eq 0 ]
+        then
+            echo "Available"
+        else
+            echo "Unavailable"
+        fi
+    fi
     exit 0
 fi
 
