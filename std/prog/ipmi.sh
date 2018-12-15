@@ -57,7 +57,8 @@ if [ "$1" = "shell" ]; then
     fi
 
     # read config file
-    host=`cat ~/.ipmi/ipmi.conf`
+    host=(`cat ~/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-`)
+    echo "$host"
     if [ "$host" = "" ]; then
         echo "Cannot get host IP address!"
     else
@@ -140,9 +141,20 @@ if [ "$1" = "setup" ]; then
         rm ~/.ipmi/ipmi.conf
     fi
 
-    read -p "Enter ip address of the host PC : " hIP
-    echo "$hIP" >> ~/.ipmi/ipmi.conf
+    read -p "Enter ip address of the host PC : " hostIP
+    echo "HostIP=$hostIP" >> ~/.ipmi/ipmi.conf
     echo ""
+
+    read -p "Enter username for web interface : " webUser
+    userHash=($(echo -n $webUser | sha256sum | cut -c -64))
+    echo "WebUser=$userHash" >> ~/.ipmi/ipmi.conf
+    echo ""
+
+    read -p "Enter password for web interface : " webPasswd
+    passwdHash=($(echo -n $webPasswd | sha256sum | cut -c -64))
+    echo "WebPasswd=$passwdHash" >> ~/.ipmi/ipmi.conf
+    echo ""
+
     echo "Done!"
     exit 0
 fi
@@ -179,6 +191,7 @@ if [ "$1" = "ping" ]; then
     fi
     exit 0
 fi
+
 
 echo -e "Error : Unknown argument \"$1\" !"
 exit 1

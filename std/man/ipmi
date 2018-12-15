@@ -17,6 +17,8 @@ ipmi [help]
      [stop] [-f]
 .br
      [restart] [-f]
+.br
+     [setup]
 .SH DESCRIPTION
 ipmi is shell command line to control IPMI module.
 .SH OPTIONS
@@ -52,6 +54,10 @@ Restart the host system.
 \fB-f\fP
 .br
 Force stop or restart the host system.
+.TP
+\fBsetup\fP
+.br
+Setup ip address of host system and user/password for web interface.
 .SH BUGS
 No known bugs.
 .SH AUTHOR

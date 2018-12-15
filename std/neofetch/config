@@ -39,6 +39,8 @@ print_info() {
     info line_break
     info line_break
     info line_break
+    info line_break
+    info line_break
 }
 
 

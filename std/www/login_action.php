@@ -5,8 +5,22 @@
     if($DEBUG)
         echo $usrname."@".$passwd."<br/>";
     session_start();
+
+    //calc hash
+    $usrHash = hash('sha256', $usrname);
+    $passwdHash = hash('sha256', $passwd);
+
+    //check valid hash incase someone try to inject to system
+
+    //read hash from config file
+    //cat ipmi.conf | grep "WebUser=" | cut -c 9-
+    //cat ipmi.conf | grep "WebPasswd=" | cut -c 11-
+    $savedUsrHash = shell_exec('cat /home/ipmi/.ipmi/ipmi.conf | grep "WebUser=" | cut -c 9-');
+    $savedPasswdHash = shell_exec('cat /home/ipmi/.ipmi/ipmi.conf | grep "WebPasswd=" | cut -c 11-');
+
     
-    if($usrname == "admin" && $passwd == "admin")
+    //if($usrname == "admin" && $passwd == "admin")
+    if($usrHash == $savedUsrHash && $passwdHash == $savedPasswdHash)
     {
         $_SESSION["login"] = True;
         header("Location: index.php");
@@ -14,7 +28,7 @@
     else
     {
         $_SESSION["login"] = False;
-        header("Location: msg.php?msg=Wrong username or password");
+        header("Location: msg.php?msg=Wrong username or password!");
     }
 ?>
 
