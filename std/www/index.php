@@ -14,9 +14,9 @@
     
     $uptime = shell_exec("uptime -p | cut -c 3-");
 
-    $wlan_ip = shell_exec('ifconfig wlan0 | grep -oP "inet \d+\.\d+\.\d+" | cut -c 6-');   
+    $wlan_ip = shell_exec('ifconfig wlan0 | grep -oP "inet \d+\.\d+\.\d+\.\d+" | cut -c 6-');   
 
-    $local_ip = shell_exec('ifconfig usb0 | grep -oP "inet \d+\.\d+\.\d+" | cut -c 6-');   
+    $local_ip = shell_exec('ifconfig usb0 | grep -oP "inet \d+\.\d+\.\d+\.\d+" | cut -c 6-');   
 
     $version = shell_exec('ipmi-version');
 
