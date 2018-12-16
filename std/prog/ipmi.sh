@@ -57,7 +57,7 @@ if [ "$1" = "shell" ]; then
     fi
 
     # read config file
-    host=('cat ~/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-')
+    host=('cat /home/ipmi/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-')
     echo "$host"
     if [ "$host" = "" ]; then
         echo "Cannot get host IP address!"
@@ -76,7 +76,7 @@ if [ "$1" = "status" ]; then
         exit 1
     fi
     # run status report script
-    python ~/.ipmi/ipmi.py status
+    python /home/ipmi/.ipmi/ipmi.py status
     exit 0
 fi
 
@@ -88,7 +88,7 @@ if [ "$1" = "start" ]; then
         exit 1
     fi
     echo "Start : python ipmi.py start"
-    python ~/.ipmi/ipmi.py start
+    python /home/ipmi/.ipmi/ipmi.py start
     exit 0
 fi
 
@@ -99,7 +99,7 @@ if [ "$1" = "stop" ]; then
         exit 1
     fi
 
-    _command="python ~/.ipmi/ipmi.py stop"
+    _command="python /home/ipmi/.ipmi/ipmi.py stop"
 
     if [ "$_force" == true ]; then
         _command="$_command -f"
@@ -117,7 +117,7 @@ if [ "$1" = "restart" ]; then
         exit 1
     fi
 
-    _command="python ~/.ipmi/ipmi.py restart"
+    _command="python /home/ipmi/.ipmi/ipmi.py restart"
 
     if [ "$_force" == true ]; then
         _command="$_command -f"
@@ -136,23 +136,23 @@ if [ "$1" = "setup" ]; then
     fi
 
     # delete old config line
-    if [ -f ~/.ipmi/ipmi.conf ]; then
+    if [ -f /home/ipmi/.ipmi/ipmi.conf ]; then
         echo "Delete old config file."
-        rm ~/.ipmi/ipmi.conf
+        rm /home/ipmi/.ipmi/ipmi.conf
     fi
 
     read -p "Enter ip address of the host PC : " hostIP
-    echo "HostIP=$hostIP" >> ~/.ipmi/ipmi.conf
+    echo "HostIP=$hostIP" >> /home/ipmi/.ipmi/ipmi.conf
     echo ""
 
     read -p "Enter username for web interface : " webUser
     userHash=($(echo -n $webUser | sha256sum | cut -c -64))
-    echo "WebUser=$userHash" >> ~/.ipmi/ipmi.conf
+    echo "WebUser=$userHash" >> /home/ipmi/.ipmi/ipmi.conf
     echo ""
 
     read -p "Enter password for web interface : " webPasswd
     passwdHash=($(echo -n $webPasswd | sha256sum | cut -c -64))
-    echo "WebPasswd=$passwdHash" >> ~/.ipmi/ipmi.conf
+    echo "WebPasswd=$passwdHash" >> /home/ipmi/.ipmi/ipmi.conf
     echo ""
 
     echo "Done!"
@@ -177,7 +177,7 @@ if [ "$1" = "ping" ]; then
         exit 1
     fi
     
-    host=('cat ~/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-')
+    host=('cat /home/ipmi/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-')
     if [ "$host" = "" ]; then
         echo "Cannot get host IP address!"
     else
