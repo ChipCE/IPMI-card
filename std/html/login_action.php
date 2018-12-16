@@ -20,7 +20,7 @@
 
     
     //if($usrname == "admin" && $passwd == "admin")
-    if($usrHash == $savedUsrHash && $passwdHash == $savedPasswdHash)
+    if(trim($usrHash) == trim($savedUsrHash) && trim($passwdHash) == trim($savedPasswdHash))
     {
         $_SESSION["login"] = True;
         header("Location: index.php");

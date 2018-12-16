@@ -20,14 +20,16 @@ fi
 adduser ipmi
 
 # add to sudo group
-usermod -aG sudo ipmi
+echo "Add ipmi to sudo group."
+usermod -a -G sudo ipmi
 
 # gpio user group
 echo "Add ipmi to gpio group."
-useradd -g ipmi gpio
+sudo usermod -a -G gpio ipmi
+
 
 # install package
-apt-get install -y apache2 php libapache2-mod-php
+apt-get install -y apache2 php libapache2-mod-php neofetch
 
 
 # ipmi to /bin
@@ -76,8 +78,8 @@ gzip /usr/share/man/man1/ipmi.1
 
 # copy www
 echo "copy web interface to /var/www/html"
-rm -rf /var/www/http/index.html
-yes | cp -rf /var/www/http
+rm -rf /var/www/html/index.html
+yes | cp -rf html /var/www
 
 # copy boot file
 # echo "Add custom cmdline.txt to /boot"

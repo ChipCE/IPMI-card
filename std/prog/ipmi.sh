@@ -57,7 +57,7 @@ if [ "$1" = "shell" ]; then
     fi
 
     # read config file
-    host=(`cat ~/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-`)
+    host=('cat ~/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-')
     echo "$host"
     if [ "$host" = "" ]; then
         echo "Cannot get host IP address!"
@@ -136,7 +136,7 @@ if [ "$1" = "setup" ]; then
     fi
 
     # delete old config line
-    if [ -f "~/.ipmi/ipmi.conf" ]; then
+    if [ -f ~/.ipmi/ipmi.conf ]; then
         echo "Delete old config file."
         rm ~/.ipmi/ipmi.conf
     fi
@@ -177,7 +177,7 @@ if [ "$1" = "ping" ]; then
         exit 1
     fi
     
-    host=`cat ~/.ipmi/ipmi.conf`
+    host=('cat ~/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-')
     if [ "$host" = "" ]; then
         echo "Cannot get host IP address!"
     else

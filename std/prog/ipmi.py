@@ -63,7 +63,7 @@ def restart(_force):
 
 # status report
 def status():
-    print("Status report")
+    #print("Status report")
     # power
     if powerState():
         print("Power state : ON")
@@ -89,12 +89,12 @@ force = False
 if (len(sys.argv) > 3):
     print("Error : Too much arguments!")
     gpio.cleanup()
-    sys.exit
+    sys.exit()
 
 if (len(sys.argv) <2 ):
     print("Error : Too few arguments")
     gpio.cleanup()
-    sys.exit
+    sys.exit()
 
 if (len(sys.argv) == 3):
     if (sys.argv[2] == "-f"):
@@ -104,24 +104,24 @@ if (len(sys.argv) == 3):
 if (sys.argv[1] == "start"):
     start()
     gpio.cleanup()
-    sys.exit
+    sys.exit()
 
 if (sys.argv[1] == "stop"):
     stop(force)
     gpio.cleanup()
-    sys.exit
+    sys.exit()
     
 if (sys.argv[1] == "restart"):
     restart(force)
     gpio.cleanup()
-    sys.exit
+    sys.exit()
 
 if (sys.argv[1] == "status"):
     status()
     gpio.cleanup()
-    sys.exit
+    sys.exit()
 
 print("Error : Unknow arguments")
 gpio.cleanup()
-sys.exit
+sys.exit()
 

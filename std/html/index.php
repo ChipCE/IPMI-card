@@ -18,9 +18,9 @@
 
     $local_ip = shell_exec('ifconfig usb0 | grep -oP "inet \d+\.\d+\.\d+\.\d+" | cut -c 6-');   
 
-    $version = shell_exec('ipmi-version');
+    $version = shell_exec('ipmi version');
 
-    $host_ip = shell_exec("cat /home/chip/.ipmi/ipmi.conf"); 
+    $host_ip = shell_exec('cat /home/ipmi/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-');
 
     $host_power = shell_exec("ipmi status | cut -c 15-"); 
 
