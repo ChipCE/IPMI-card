@@ -24,7 +24,7 @@ adduser ipmi
 echo "Add ipmi to sudo group."
 usermod -a -G sudo ipmi
 
-# gpio user group
+# Add ipmi to gpio user group
 echo "Add ipmi to gpio group."
 sudo usermod -a -G gpio ipmi
 
@@ -37,7 +37,7 @@ apt-get dist-upgrade
 echo "Install packages..."
 apt-get install -y apache2 php libapache2-mod-php neofetch
 
-# gpio user group
+# Add www-data to gpio user group
 echo "Add www-data to gpio group."
 sudo usermod -a -G gpio www-data
 
