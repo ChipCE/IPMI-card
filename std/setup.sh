@@ -64,6 +64,11 @@ echo "Copy neofetch ascii to /usr/share/neofetch/ascii/distro/raspbian"
 yes | cp -rf neofetch/ipmi /usr/share/neofetch/ascii/distro/raspbian
 chmod 775 /usr/share/neofetch/ascii/distro/raspbian
 
+# add neofetch bo bashrc
+echo "Add neifetch entry to bashrc"
+echo "#neofetch" >> /home/ipmi/.bashrc
+echo "neofetch" >> /home/ipmi/.bashrc
+
 # man
 echo "Copy ipmi to /usr/share/man/man1/ipmi.1"
 yes | cp -rf man/ipmi /usr/share/man/man1/ipmi.1
