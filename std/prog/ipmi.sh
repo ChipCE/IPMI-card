@@ -1,6 +1,6 @@
 #!/bin/bash
 # var
-version="1.0 alpha"
+version="1.0 beta"
 
 # function
 ipmi-help () {
@@ -57,7 +57,7 @@ if [ "$1" = "shell" ]; then
     fi
 
     # read config file
-    host=('cat /home/ipmi/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-')
+    host=(`cat /home/ipmi/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-`)
     echo "$host"
     if [ "$host" = "" ]; then
         echo "Cannot get host IP address!"
@@ -177,7 +177,7 @@ if [ "$1" = "ping" ]; then
         exit 1
     fi
     
-    host=('cat /home/ipmi/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-')
+    host=(`cat /home/ipmi/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-`)
     if [ "$host" = "" ]; then
         echo "Cannot get host IP address!"
     else

@@ -13,8 +13,8 @@
     if($arg == "start")
         shell_exec("ipmi start");
     if($arg == "stop")
-        shell_exec("ipmi restart");
-    if($arg == "")
+        shell_exec("ipmi stop");
+    if($arg == "restart")
         shell_exec("ipmi restart");
 
     header("Location: msg.php?msg=Please wait...");

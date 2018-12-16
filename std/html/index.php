@@ -16,8 +16,6 @@
 
     $wlan_ip = shell_exec('ifconfig wlan0 | grep -oP "inet \d+\.\d+\.\d+\.\d+" | cut -c 6-');   
 
-    $local_ip = shell_exec('ifconfig usb0 | grep -oP "inet \d+\.\d+\.\d+\.\d+" | cut -c 6-');   
-
     $version = shell_exec('ipmi version');
 
     $host_ip = shell_exec('cat /home/ipmi/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-');
@@ -92,7 +90,7 @@
                             <td class="col-7 text-nowrap"><?php echo $host_shell; ?></td>
                         </tr>
                         <tr class="d-flex">
-                            <th scope="row" class="text-nowrap col-5">Local-link IP</th>
+                            <th scope="row" class="text-nowrap col-5">IP address</th>
                             <td class="col-7 text-nowrap"><?php echo $host_ip; ?></td>
                         </tr>
                     </tbody>
@@ -113,10 +111,6 @@
                         <tr class="d-flex">
                             <th scope="row" class="text-nowrap col-5">IP address</th>
                             <td class="col-7 text-nowrap"><?php echo $wlan_ip; ?></td>
-                        </tr>
-                        <tr class="d-flex">
-                            <th scope="row" class="text-nowrap col-5">Local-link IP</th>
-                            <td class="col-7 text-nowrap"><?php echo $local_ip; ?></td>
                         </tr>
                         <tr class="d-flex">
                             <th scope="row" class="text-nowrap col-5 text-truncate">Software</th>
