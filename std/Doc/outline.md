@@ -37,11 +37,14 @@ Raspberry Zero W GPIOの出力電力が低く、直接リレーを制御でき�
 ### 4.1 コマンドラインインターフェース(CLI)
 ホストPCを遠隔操作するためにSSHプロトコルを利用する。ipmiモジュールにインストールされたipmiツールでほすとPCの電源やソフトウエア制御を行う。　　　
 使用可能なコマンドライン:
-- start/stop/restart : ホストPCの物理的の電源制御(電源入/切/再起動)。
+- start :  ホストPCを起動する。
+- stop :　ホストPCの電源を切る。
+- restart : ホストPCを再起動する。
 - status : ホストPCの状態を表示する。
 - setup : ipmiモジュールの設定を行う。ホストPCをアクセスためのIPアドレスやWebインターフェースアクセスためのパスワードを変更することができる。
 - shell : ホストPCのソフトウェア制御を行う。ホストPCがWindowsの場合はPowershell、Linuxの場合はbash/zshに接続する。
-- help/version : ipmiのマニュアル、ソフトウェアバージョンを表示。
+- version : ipmiのソフトウェアバージョンを表示。
+- help : ipmiのマニュアルを表示。
 ![ipmi-flowchart](./img/pc-cli-home.png)
 <center>図5．パソコンのCLI</center> 
 ![ipmi-flowchart](./img/mobile-cli-all.png)
