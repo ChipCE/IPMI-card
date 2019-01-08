@@ -18,7 +18,10 @@ Apache+Php（ウエブサーバー）でクライアント端末にウエブイ�
 ### 3.1 電源スイッチ制御回路
 ![ipmi-flowchart](./img/schem-relay.png)
 <center>図2．電源制御回路図</center>
-Raspberry Zero W GPIOの出力電力が低く、直接リレーを制御できないため、NPNトランジスタスイッチ回路リレーを制御する。リレーは電源スイッチと並列に接続する。
+ホストPCの電源状態と関係なく制御するために、物理的にマザーボードの電源スイッチを操作することが必要と考えられる。電源スイッチを制御するためにリレーを用いる。リレーは電源スイッチと並列に接続する。リレーはホストPCの電源スイッチと並列接続することで、スイッチの機能を保ちながら、ホストPCの電源を制御することができる。
+Raspberry Zero W GPIOの出力電力が低く、直接リレーを制御できないため、NPNトランジスタスイッチ回路リレーを制御する。
+Raspberry Zero WのGPIO-18の初期化状態はINPUT－PULLDOWN（入力・プルダウン）ため、IPMIモジュールの起動、再起動ときにリレーの誤動作を生じないため、ホストPCの誤動作を防ぐことができる。
+
 
 ### 3.2 電源状態監視回路
 ![ipmi-flowchart](./img/schem-monitor.png)
@@ -38,13 +41,14 @@ Raspberry Zero W GPIOの出力電力が低く、直接リレーを制御でき�
 ホストPCを遠隔操作するためにSSHプロトコルを利用する。ipmiモジュールにインストールされたipmiツールでほすとPCの電源やソフトウエア制御を行う。　　　
 使用可能なコマンドライン:
 - start :  ホストPCを起動する。
-- stop :　ホストPCの電源を切る。
+- stop :　ホストPCをシャットダウンする。
 - restart : ホストPCを再起動する。
 - status : ホストPCの状態を表示する。
 - setup : ipmiモジュールの設定を行う。ホストPCをアクセスためのIPアドレスやWebインターフェースアクセスためのパスワードを変更することができる。
 - shell : ホストPCのソフトウェア制御を行う。ホストPCがWindowsの場合はPowershell、Linuxの場合はbash/zshに接続する。
 - version : ipmiのソフトウェアバージョンを表示。
 - help : ipmiのマニュアルを表示。
+- -f シャットダウン、再起動を強制に実行。シャットダウン、再起動の命令を実行後、一定の時間たってもホストPCの電源状態が変化しないとき強制的に電源を切る。
 ![ipmi-flowchart](./img/pc-cli-home.png)
 <center>図5．パソコンのCLI</center> 
 ![ipmi-flowchart](./img/mobile-cli-all.png)
