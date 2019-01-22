@@ -15,7 +15,6 @@ if [ "$uConfirm" != "y" ]; then
     exit 1
 fi
 
-
 # create user
 echo "Create user ipmi"
 adduser ipmi
@@ -40,7 +39,6 @@ apt-get install -y apache2 php libapache2-mod-php neofetch
 # Add www-data to gpio user group
 echo "Add www-data to gpio group."
 sudo usermod -a -G gpio www-data
-
 
 # ipmi to /bin
 echo "Copy ipmi to /bin/ipmi"
@@ -95,9 +93,5 @@ yes | cp -rf html /var/www
 # echo "Add custom cmdline.txt to /boot"
 # cp
 
-
 echo "Done!"
 exit 0
-
-
-

@@ -10,16 +10,13 @@
     $usrHash = hash('sha256', $usrname);
     $passwdHash = hash('sha256', $passwd);
 
-    //check valid hash incase someone try to inject to system
-
     //read hash from config file
     //cat ipmi.conf | grep "WebUser=" | cut -c 9-
     //cat ipmi.conf | grep "WebPasswd=" | cut -c 11-
     $savedUsrHash = shell_exec('cat /home/ipmi/.ipmi/ipmi.conf | grep "WebUser=" | cut -c 9-');
     $savedPasswdHash = shell_exec('cat /home/ipmi/.ipmi/ipmi.conf | grep "WebPasswd=" | cut -c 11-');
 
-    
-    //if($usrname == "admin" && $passwd == "admin")
+    //trim the hash string
     if(trim($usrHash) == trim($savedUsrHash) && trim($passwdHash) == trim($savedPasswdHash))
     {
         $_SESSION["login"] = True;

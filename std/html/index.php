@@ -8,24 +8,14 @@
         die();
     }
 
-
-    //uname
     $kernel = shell_exec("uname -r");
-    
     $uptime = shell_exec("uptime -p | cut -c 3-");
-
     $wlan_ip = shell_exec('ifconfig wlan0 | grep -oP "inet \d+\.\d+\.\d+\.\d+" | cut -c 6-');   
-
     $version = shell_exec('ipmi version');
-
     $host_ip = shell_exec('cat /home/ipmi/.ipmi/ipmi.conf | grep "HostIP=" | cut -c 8-');
-
     $host_power = shell_exec("ipmi status | cut -c 15-"); 
-
     $host_shell = shell_exec("ipmi ping"); 
-
 ?>
-
 
 <!doctype html>
 <html lang="en">
@@ -35,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap.css">
     <!-- custom css -->
     <link rel="stylesheet" href="style.css">
 
@@ -132,9 +122,8 @@
     
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="jquery-3.3.1.slim.min.js"></script>
-    <script src="popper.min.js"></script>
-    <script src="bootstrap.min.js"></script>
-    <script src="script.js"></script>
+    <script src="jquery-3.3.1.slim.js"></script>
+    <script src="popper.js"></script>
+    <script src="bootstrap.js"></script>
   </body>
 </html>

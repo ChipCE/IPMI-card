@@ -15,7 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap.css">
     <!-- custom css -->
     <link rel="stylesheet" href="style.css">
 
@@ -83,9 +83,8 @@
     
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="jquery-3.3.1.slim.min.js"></script>
-    <script src="popper.min.js"></script>
-    <script src="bootstrap.min.js"></script>
-    <script src="script.js"></script>
+    <script src="jquery-3.3.1.slim.js"></script>
+    <script src="popper.js"></script>
+    <script src="bootstrap.js"></script>
   </body>
 </html>

@@ -1,6 +1,6 @@
 #!/bin/bash
 # var
-version="1.0 beta"
+version="1.2 beta"
 
 # function
 ipmi-help () {
@@ -26,16 +26,13 @@ ipmi-help () {
     echo -e "\t setup \n\t\t Setup IPMI."
 }
 
-
-# main program ------------------------------------------------------
-
 # check if the first arg is empty 
 if [ -z "$1" ]; then
     ipmi-help
     exit 0
 fi
 
-# arg check
+# force flag
 _force=false
 
 # check 2nd arg
@@ -47,7 +44,6 @@ if [ -n "$2" ]; then
         exit 1
     fi
 fi
-
 
 # open ssh connection
 if [ "$1" = "shell" ]; then
@@ -79,7 +75,6 @@ if [ "$1" = "status" ]; then
     python /home/ipmi/.ipmi/ipmi.py status
     exit 0
 fi
-
 
 # handle start
 if [ "$1" = "start" ]; then
@@ -191,7 +186,6 @@ if [ "$1" = "ping" ]; then
     fi
     exit 0
 fi
-
 
 echo -e "Error : Unknown argument \"$1\" !"
 exit 1

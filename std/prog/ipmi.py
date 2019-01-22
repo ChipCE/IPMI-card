@@ -16,14 +16,14 @@ gpio.setup(18, gpio.OUT)
 # function define ---------------------------------------
 # shutdown control
 def stop(_force):
-    print("Stop")
+    #print("Stop")
     # if the sys is already off
     if powerState() == False:
         print("System state is OFF.")
         return
     # if not , then turn it off
     if _force == True:
-        print("Trying to force shutdown...")
+        print("Trying to force stop...")
         gpio.output(18, gpio.HIGH)
         while powerState():
             pass
@@ -99,7 +99,6 @@ if (len(sys.argv) <2 ):
 if (len(sys.argv) == 3):
     if (sys.argv[2] == "-f"):
         force = True
-
 
 if (sys.argv[1] == "start"):
     start()
