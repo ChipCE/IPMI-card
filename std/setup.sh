@@ -40,6 +40,18 @@ apt-get install -y apache2 php libapache2-mod-php neofetch
 echo "Add www-data to gpio group."
 sudo usermod -a -G gpio www-data
 
+echo "Enable auto-startup for apache."
+#sudo systemctl enable apache2
+#sudo systemctl start apache2
+sudo systemctl enable apache
+sudo systemctl start apache
+
+#echo "Copy nodered script."
+
+echo "Enable auto-startup for nodered."
+sudo systemctl enable nodered
+sudo systemctl start nodered
+
 # ipmi to /bin
 echo "Copy ipmi to /bin/ipmi"
 yes | cp -rf prog/ipmi.sh /bin/ipmi
